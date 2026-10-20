@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="130" viewBox="0 0 520 130" role="img" aria-labelledby="title desc">
+  <title id="title">BantuDunia</title>
+  <desc id="desc">Logo BantuDunia: bumi yang melambangkan bantuan digital untuk semua orang.</desc>
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f9b8e"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(5 5)">
+    <rect width="120" height="120" rx="30" fill="url(#brand)"/>
+    <circle cx="60" cy="54" r="34" fill="none" stroke="#fff" stroke-width="4"/>
+    <path d="M26 54h68M60 20c-11 10-17 21-17 34s6 24 17 34M60 20c11 10 17 21 17 34s-6 24-17 34M32 36c8 6 18 9 28 9s20-3 28-9M32 72c8-6 18-9 28-9s20 3 28 9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".92"/>
+    <path d="M28 87c9 10 20 16 32 16s23-6 32-16" fill="none" stroke="#b8fff0" stroke-width="5" stroke-linecap="round"/>
+    <path d="M42 91l18 10 18-10" fill="none" stroke="#b8fff0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="148" y="67" font-family="Arial, Helvetica, sans-serif" font-size="47" font-weight="800" letter-spacing="-1.5" fill="#172b35">Bantu</text>
+  <text x="285" y="67" font-family="Arial, Helvetica, sans-serif" font-size="47" font-weight="800" letter-spacing="-1.5" fill="#0f9488">Dunia</text>
+  <text x="151" y="98" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" letter-spacing=".6" fill="#627681">ALAT DIGITAL GRATIS UNTUK SEMUA</text>
+</svg>
