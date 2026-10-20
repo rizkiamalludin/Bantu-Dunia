@@ -1008,7 +1008,8 @@
           body.innerHTML += "<div class='resource-list'>"+page.items.map(item=>"<div class='resource-item'><h3>"+safeText(item[0])+"</h3><p>"+safeText(item[1])+"</p><a href='"+item[2]+"' target='_blank' rel='noopener noreferrer'>Buka situs →</a></div>").join("")+"</div>";
         }
       }
-\n      if (id === "words") {
+
+      if (id === "words") {
         body.innerHTML = `
           <div class="field">
             <label for="wordInput">${tr("inputText")}</label>
