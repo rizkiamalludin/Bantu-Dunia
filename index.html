@@ -457,6 +457,13 @@
       }
     }
   </style>
+
+  <style id="site-quality-baseline">
+    :focus-visible{outline:3px solid #38bdf8;outline-offset:3px}
+    img,svg,video,canvas{max-width:100%}
+    [id]{scroll-margin-top:5.5rem}
+    @media(prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
 </head>
 
 <body>
