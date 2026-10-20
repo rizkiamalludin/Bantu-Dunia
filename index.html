@@ -1,0 +1,1099 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BantuDunia menyediakan alat digital gratis untuk belajar, bekerja, dan membantu kehidupan sehari-hari.">
+  <meta name="theme-color" content="#0f766e">
+  <title>BantuDunia — Alat Gratis untuk Semua</title>
+
+  <style>
+    :root {
+      --bg: #f5f8fa;
+      --card: #ffffff;
+      --text: #172b35;
+      --muted: #627681;
+      --primary: #0f766e;
+      --soft: #e0f2ef;
+      --border: #e1e9ed;
+    }
+
+    body.dark {
+      --bg: #101a22;
+      --card: #1b2933;
+      --text: #edf6f8;
+      --muted: #afc0c9;
+      --primary: #55d6c2;
+      --soft: #243d42;
+      --border: #344550;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .container {
+      width: min(1120px, 92%);
+      margin: auto;
+    }
+
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .navbar {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo {
+      color: var(--primary);
+      font-size: 25px;
+      font-weight: 800;
+      text-decoration: none;
+      letter-spacing: -1px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .small-button, .language {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .hero {
+      padding: 76px 0 58px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at top, var(--soft), transparent 68%);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 13px;
+      border-radius: 99px;
+      background: var(--soft);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      max-width: 800px;
+      margin: auto;
+      font-size: clamp(34px, 6vw, 62px);
+      line-height: 1.12;
+      letter-spacing: -2px;
+    }
+
+    .highlight {
+      color: var(--primary);
+    }
+
+    .hero p {
+      max-width: 620px;
+      margin: 20px auto 28px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .search-box {
+      display: flex;
+      max-width: 570px;
+      margin: auto;
+      padding: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 8px 30px #163e4b0b;
+    }
+
+    .search-box input {
+      min-width: 0;
+      flex: 1;
+      padding: 12px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .primary-button {
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+    }
+
+    body.dark .primary-button {
+      color: #10211f;
+    }
+
+    .section {
+      padding: 45px 0;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .section-heading h2 {
+      font-size: 28px;
+      letter-spacing: -0.7px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .categories {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .category {
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 9px 15px;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .category.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .tool-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 23px;
+      transition: transform 0.2s, border-color 0.2s;
+      animation: appear 0.4s ease both;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+    }
+
+    .tool-icon {
+      width: 49px;
+      height: 49px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--soft);
+      font-size: 25px;
+      margin-bottom: 17px;
+    }
+
+    .tool-card h3 {
+      font-size: 19px;
+      margin-bottom: 7px;
+    }
+
+    .tool-card p {
+      min-height: 48px;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .tool-link {
+      display: inline-block;
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .tool-link:hover {
+      text-decoration: underline;
+    }
+
+    .empty {
+      display: none;
+      padding: 35px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .about {
+      padding: 36px;
+      border-radius: 22px;
+      background: var(--soft);
+      text-align: center;
+    }
+
+    .about h2 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .about p {
+      max-width: 680px;
+      margin: auto;
+      color: var(--muted);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 28px;
+    }
+
+    .stat {
+      padding: 18px 10px;
+      border-radius: 13px;
+      background: var(--card);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 23px;
+      color: var(--primary);
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer {
+      margin-top: 45px;
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      padding: 18px;
+      background: #0009;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-content {
+      width: min(540px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 26px;
+      border-radius: 18px;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .close-button {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .field {
+      margin: 14px 0;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .result {
+      margin-top: 18px;
+      padding: 15px;
+      border-radius: 10px;
+      background: var(--soft);
+      overflow-wrap: anywhere;
+    }
+
+    .result strong {
+      display: block;
+      font-size: 22px;
+      margin: 5px 0;
+    }
+
+    .result textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      margin-top: 8px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 760px) {
+      .tools-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .hero {
+        padding: 54px 0 42px;
+      }
+      .section-heading h2 {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .tools-grid {
+        grid-template-columns: 1fr;
+      }
+      .navbar {
+        min-height: 64px;
+      }
+      .logo {
+        font-size: 22px;
+      }
+      .language {
+        max-width: 105px;
+      }
+      .hero p {
+        font-size: 15px;
+      }
+      .search-box .primary-button {
+        padding: 10px 13px;
+      }
+      .stats {
+        gap: 7px;
+      }
+      .stat strong {
+        font-size: 19px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container navbar">
+      <a class="logo" href="#" aria-label="BantuDunia beranda">🌍 BantuDunia</a>
+
+      <div class="nav-actions">
+        <select id="language" class="language" aria-label="Pilih bahasa">
+          <option value="id">🇮🇩 Indonesia</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="pt">🇧🇷 Português</option>
+          <option value="ar">🇸🇦 العربية</option>
+          <option value="ja">🇯🇵 日本語</option>
+          <option value="zh">🇨🇳 中文</option>
+          <option value="hi">🇮🇳 हिन्दी</option>
+        </select>
+        <button class="small-button" id="themeButton" aria-label="Ganti tema">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <span class="tag" data-i18n="tag">PLATFORM DIGITAL GRATIS</span>
+        <h1 data-i18n="headline">Satu tempat untuk <span class="highlight">membantu dunia.</span></h1>
+        <p data-i18n="intro">Alat digital gratis untuk belajar, berkarya, mengatur kehidupan, dan menyelesaikan masalah sehari-hari. Bisa digunakan siapa saja.</p>
+
+        <form class="search-box" id="searchForm">
+          <input id="searchInput" type="search" data-i18n-placeholder="searchPlaceholder" placeholder="Cari alat yang kamu butuhkan..." aria-label="Cari alat">
+          <button class="primary-button" type="submit" data-i18n="searchButton">Cari alat</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="section container" id="tools">
+      <div class="section-heading">
+        <div>
+          <h2 data-i18n="toolsTitle">Alat gratis untuk semua</h2>
+          <p data-i18n="toolsSubtitle">Pilih alat yang kamu perlukan.</p>
+        </div>
+      </div>
+
+      <div class="categories" id="categories">
+        <button class="category active" data-category="all" data-i18n="all">Semua</button>
+        <button class="category" data-category="productivity" data-i18n="productivity">Produktivitas</button>
+        <button class="category" data-category="education" data-i18n="education">Pendidikan</button>
+        <button class="category" data-category="writing" data-i18n="writing">Karya</button>
+        <button class="category" data-category="daily" data-i18n="daily">Kebutuhan harian</button>
+      </div>
+
+      <div class="tools-grid" id="toolsGrid"></div>
+      <div class="empty" id="emptyMessage" data-i18n="empty">Alat tidak ditemukan. Coba kata kunci lain.</div>
+    </section>
+
+    <section class="section container">
+      <div class="about">
+        <h2 data-i18n="aboutTitle">Teknologi untuk semua orang</h2>
+        <p data-i18n="aboutText">BantuDunia dibuat dengan tujuan menyediakan bantuan digital yang sederhana, mudah diakses, dan gratis. Sedikit bantuan bisa membawa perubahan besar.</p>
+        <div class="stats">
+          <div class="stat">
+            <strong>100%</strong>
+            <span data-i18n="free">Gratis digunakan</span>
+          </div>
+          <div class="stat">
+            <strong>9</strong>
+            <span data-i18n="languages">Pilihan bahasa awal</span>
+          </div>
+          <div class="stat">
+            <strong>24/7</strong>
+            <span data-i18n="available">Bisa diakses kapan saja*</span>
+          </div>
+        </div>
+        <p style="font-size:12px;margin-top:12px" data-i18n="note">*Selama situs dan koneksi internet tersedia.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <span>© <span id="year"></span> BantuDunia</span>
+      <span data-i18n="footer">Dibuat untuk membantu, bukan mempersulit. 💚</span>
+    </div>
+  </footer>
+
+  <div class="modal" id="toolModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalTitle">Nama alat</h2>
+          <p id="modalDescription" style="color:var(--muted)"></p>
+        </div>
+        <button class="close-button" id="closeModal" aria-label="Tutup">✕</button>
+      </div>
+      <div id="toolBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const translations = {
+      id: {
+        tag:"PLATFORM DIGITAL GRATIS",
+        headline:'Satu tempat untuk <span class="highlight">membantu dunia.</span>',
+        intro:"Alat digital gratis untuk belajar, berkarya, mengatur kehidupan, dan menyelesaikan masalah sehari-hari. Bisa digunakan siapa saja.",
+        searchPlaceholder:"Cari alat yang kamu butuhkan...",
+        searchButton:"Cari alat", toolsTitle:"Alat gratis untuk semua",
+        toolsSubtitle:"Pilih alat yang kamu perlukan.", all:"Semua",
+        productivity:"Produktivitas", education:"Pendidikan", writing:"Karya",
+        daily:"Kebutuhan harian", empty:"Alat tidak ditemukan. Coba kata kunci lain.",
+        aboutTitle:"Teknologi untuk semua orang",
+        aboutText:"BantuDunia dibuat dengan tujuan menyediakan bantuan digital yang sederhana, mudah diakses, dan gratis. Sedikit bantuan bisa membawa perubahan besar.",
+        free:"Gratis digunakan", languages:"Pilihan bahasa awal",
+        available:"Bisa diakses kapan saja*", note:"*Selama situs dan koneksi internet tersedia.",
+        footer:"Dibuat untuk membantu, bukan mempersulit. 💚",
+        use:"Buka alat →", wordCount:"Penghitung kata", wordDesc:"Hitung kata dan karakter dalam tulisan.",
+        calculator:"Kalkulator", calcDesc:"Hitung angka dengan mudah.",
+        notes:"Catatan", notesDesc:"Tulis dan salin catatan penting.",
+        percentage:"Kalkulator persentase", percentDesc:"Hitung persentase suatu angka.",
+        goals:"Daftar tugas", goalsDesc:"Susun tugas agar lebih teratur.",
+        password:"Pembuat kata sandi", passDesc:"Buat kata sandi acak di perangkatmu.",
+        age:"Penghitung umur", ageDesc:"Hitung usia berdasarkan tanggal lahir.",
+        converter:"Konversi satuan", convDesc:"Ubah kilometer, meter, dan sentimeter.",
+        study:"Panduan belajar", studyDesc:"Buat rencana belajar sederhana.",
+        inputText:"Masukkan teks", count:"Hasil hitungan",
+        words:"Kata", chars:"Karakter", charsNoSpace:"Karakter tanpa spasi",
+        copy:"Salin", copied:"Teks disalin!", number:"Masukkan angka",
+        calculate:"Hitung", result:"Hasil", firstNumber:"Angka pertama",
+        secondNumber:"Angka kedua", operator:"Operasi",
+        add:"Tambah (+)", subtract:"Kurang (−)", multiply:"Kali (×)", divide:"Bagi (÷)",
+        percentOf:"Persen (%)", ofNumber:"Dari angka",
+        taskPlaceholder:"Tulis tugas baru...", addTask:"Tambah tugas",
+        emptyTasks:"Belum ada tugas. Tambahkan tugas pertamamu!",
+        birthDate:"Tanggal lahir", todayAge:"Usia kamu",
+        unit:"Pilih konversi", value:"Nilai",
+        kmM:"Kilometer → Meter", mCm:"Meter → Sentimeter", kgG:"Kilogram → Gram",
+        hours:"Waktu belajar (menit)", breakTime:"Istirahat (menit)",
+        createPlan:"Buat rencana", planTitle:"Rencana belajar kamu",
+        passLength:"Panjang kata sandi", generate:"Buat kata sandi",
+        strongNote:"Kata sandi dibuat di perangkat ini. Simpan dengan aman dan jangan bagikan kepada orang lain.",
+        error:"Periksa angka yang kamu masukkan.",
+        save:"Simpan", saved:"Catatan disimpan di perangkat ini.",
+        close:"Tutup"
+      },
+      en: {
+        tag:"FREE DIGITAL PLATFORM",
+        headline:'One place to <span class="highlight">help the world.</span>',
+        intro:"Free digital tools for learning, creating, organizing life, and solving everyday problems. Open to everyone.",
+        searchPlaceholder:"Search for a tool...", searchButton:"Search",
+        toolsTitle:"Free tools for everyone", toolsSubtitle:"Choose a tool you need.",
+        all:"All", productivity:"Productivity", education:"Education", writing:"Writing",
+        daily:"Everyday", empty:"No tools found. Try another keyword.",
+        aboutTitle:"Technology for everyone",
+        aboutText:"BantuDunia aims to provide simple, accessible, free digital help. A little help can make a big difference.",
+        free:"Free to use", languages:"Initial language options",
+        available:"Accessible anytime*", note:"*While the site and internet connection are available.",
+        footer:"Made to help, not complicate. 💚",
+        use:"Open tool →", wordCount:"Word counter", wordDesc:"Count words and characters.",
+        calculator:"Calculator", calcDesc:"Calculate numbers easily.",
+        notes:"Notes", notesDesc:"Write and copy important notes.",
+        percentage:"Percentage calculator", percentDesc:"Calculate a percentage.",
+        goals:"Task list", goalsDesc:"Organize your tasks.",
+        password:"Password generator", passDesc:"Generate a random password locally.",
+        age:"Age calculator", ageDesc:"Calculate age from your birth date.",
+        converter:"Unit converter", convDesc:"Convert kilometers, meters and centimeters.",
+        study:"Study planner", studyDesc:"Create a simple study plan.",
+        inputText:"Enter text", count:"Word count",
+        words:"Words", chars:"Characters", charsNoSpace:"Characters without spaces",
+        copy:"Copy", copied:"Text copied!", number:"Enter a number",
+        calculate:"Calculate", result:"Result", firstNumber:"First number",
+        secondNumber:"Second number", operator:"Operation",
+        add:"Add (+)", subtract:"Subtract (−)", multiply:"Multiply (×)", divide:"Divide (÷)",
+        percentOf:"Percent (%)", ofNumber:"Of number",
+        taskPlaceholder:"Write a new task...", addTask:"Add task",
+        emptyTasks:"No tasks yet. Add your first task!",
+        birthDate:"Birth date", todayAge:"Your age",
+        unit:"Choose conversion", value:"Value",
+        kmM:"Kilometers → Meters", mCm:"Meters → Centimeters", kgG:"Kilograms → Grams",
+        hours:"Study time (minutes)", breakTime:"Break (minutes)",
+        createPlan:"Create plan", planTitle:"Your study plan",
+        passLength:"Password length", generate:"Generate password",
+        strongNote:"The password is generated on this device. Store it safely and never share it.",
+        error:"Check the numbers you entered.",
+        save:"Save", saved:"Notes saved on this device.",
+        close:"Close"
+      }
+    };
+
+    const extraTranslations = {
+      es: {
+        tag:"PLATAFORMA DIGITAL GRATUITA",
+        headline:'Un lugar para <span class="highlight">ayudar al mundo.</span>',
+        intro:"Herramientas digitales gratuitas para aprender, crear y resolver problemas cotidianos.",
+        searchPlaceholder:"Busca una herramienta...", searchButton:"Buscar",
+        toolsTitle:"Herramientas gratis para todos", toolsSubtitle:"Elige una herramienta.",
+        all:"Todo", productivity:"Productividad", education:"Educación", writing:"Escritura",
+        daily:"Vida diaria", empty:"No se encontraron herramientas.",
+        aboutTitle:"Tecnología para todos", aboutText:"BantuDunia ofrece ayuda digital sencilla, accesible y gratuita.",
+        free:"Uso gratuito", languages:"Idiomas iniciales", available:"Disponible siempre*",
+        note:"*Mientras el sitio y la conexión estén disponibles.", footer:"Hecho para ayudar. 💚",
+        use:"Abrir herramienta →"
+      },
+      fr: {
+        tag:"PLATEFORME NUMÉRIQUE GRATUITE",
+        headline:'Un seul endroit pour <span class="highlight">aider le monde.</span>',
+        intro:"Des outils numériques gratuits pour apprendre, créer et résoudre les problèmes du quotidien.",
+        searchPlaceholder:"Rechercher un outil...", searchButton:"Rechercher",
+        toolsTitle:"Des outils gratuits pour tous", toolsSubtitle:"Choisissez un outil.",
+        all:"Tout", productivity:"Productivité", education:"Éducation", writing:"Écriture",
+        daily:"Quotidien", empty:"Aucun outil trouvé.",
+        aboutTitle:"La technologie pour tous", aboutText:"BantuDunia propose une aide numérique simple, accessible et gratuite.",
+        free:"Gratuit", languages:"Langues initiales", available:"Accessible à tout moment*",
+        note:"*Si le site et la connexion sont disponibles.", footer:"Conçu pour aider. 💚",
+        use:"Ouvrir l'outil →"
+      },
+      pt: {
+        tag:"PLATAFORMA DIGITAL GRATUITA",
+        headline:'Um lugar para <span class="highlight">ajudar o mundo.</span>',
+        intro:"Ferramentas digitais gratuitas para aprender, criar e resolver problemas do dia a dia.",
+        searchPlaceholder:"Buscar uma ferramenta...", searchButton:"Buscar",
+        toolsTitle:"Ferramentas gratuitas para todos", toolsSubtitle:"Escolha uma ferramenta.",
+        all:"Todos", productivity:"Produtividade", education:"Educação", writing:"Escrita",
+        daily:"Dia a dia", empty:"Nenhuma ferramenta encontrada.",
+        aboutTitle:"Tecnologia para todos", aboutText:"BantuDunia oferece ajuda digital simples, acessível e gratuita.",
+        free:"Uso gratuito", languages:"Idiomas iniciais", available:"Acessível a qualquer hora*",
+        note:"*Enquanto o site e a conexão estiverem disponíveis.", footer:"Feito para ajudar. 💚",
+        use:"Abrir ferramenta →"
+      },
+      ar: {
+        tag:"منصة رقمية مجانية",
+        headline:'مكان واحد <span class="highlight">لمساعدة العالم.</span>',
+        intro:"أدوات رقمية مجانية للتعلم والإبداع وحل مشكلات الحياة اليومية.",
+        searchPlaceholder:"ابحث عن أداة...", searchButton:"بحث",
+        toolsTitle:"أدوات مجانية للجميع", toolsSubtitle:"اختر الأداة التي تحتاجها.",
+        all:"الكل", productivity:"الإنتاجية", education:"التعليم", writing:"الكتابة",
+        daily:"الحياة اليومية", empty:"لم يتم العثور على أدوات.",
+        aboutTitle:"التكنولوجيا للجميع", aboutText:"يقدم BantuDunia مساعدة رقمية بسيطة وسهلة الوصول ومجانية.",
+        free:"مجاني للاستخدام", languages:"خيارات اللغة الأولية", available:"متاح في أي وقت*",
+        note:"*عند توفر الموقع والاتصال بالإنترنت.", footer:"صُمم للمساعدة. 💚"
+      },
+      ja: {
+        tag:"無料デジタルプラットフォーム",
+        headline:'世界を<span class="highlight">助ける場所。</span>',
+        intro:"学習、創作、日常の問題解決に役立つ無料のデジタルツール。",
+        searchPlaceholder:"ツールを検索...", searchButton:"検索",
+        toolsTitle:"みんなの無料ツール", toolsSubtitle:"必要なツールを選んでください。",
+        all:"すべて", productivity:"生産性", education:"教育", writing:"文章作成",
+        daily:"日常生活", empty:"ツールが見つかりません。",
+        aboutTitle:"すべての人にテクノロジーを", aboutText:"BantuDuniaは、簡単で利用しやすい無料のデジタル支援を提供します。",
+        free:"無料で利用", languages:"初期言語", available:"いつでも利用可能*",
+        note:"*サイトとインターネット接続が利用可能な場合。", footer:"助けるために作りました。💚"
+      },
+      zh: {
+        tag:"免费数字平台",
+        headline:'帮助世界的<span class="highlight">一站式平台。</span>',
+        intro:"免费的数字工具，帮助你学习、创作并解决日常问题。",
+        searchPlaceholder:"搜索工具...", searchButton:"搜索",
+        toolsTitle:"人人可用的免费工具", toolsSubtitle:"选择你需要的工具。",
+        all:"全部", productivity:"效率", education:"教育", writing:"写作",
+        daily:"日常生活", empty:"没有找到工具。",
+        aboutTitle:"科技属于每一个人", aboutText:"BantuDunia致力于提供简单、易用、免费的数字帮助。",
+        free:"免费使用", languages:"初始语言选项", available:"随时访问*",
+        note:"*网站和网络连接可用时。", footer:"为帮助而创造。💚"
+      },
+      hi: {
+        tag:"मुफ़्त डिजिटल प्लेटफ़ॉर्म",
+        headline:'दुनिया की मदद के लिए <span class="highlight">एक जगह।</span>',
+        intro:"सीखने, बनाने और रोज़मर्रा की समस्याएँ हल करने के लिए मुफ़्त डिजिटल टूल।",
+        searchPlaceholder:"टूल खोजें...", searchButton:"खोजें",
+        toolsTitle:"सभी के लिए मुफ़्त टूल", toolsSubtitle:"अपना टूल चुनें।",
+        all:"सभी", productivity:"उत्पादकता", education:"शिक्षा", writing:"लेखन",
+        daily:"रोज़मर्रा", empty:"कोई टूल नहीं मिला।",
+        aboutTitle:"सभी के लिए तकनीक", aboutText:"BantuDunia सरल, सुलभ और मुफ़्त डिजिटल सहायता प्रदान करता है।",
+        free:"मुफ़्त उपयोग", languages:"शुरुआती भाषाएँ", available:"कभी भी उपलब्ध*",
+        note:"*जब साइट और इंटरनेट उपलब्ध हों।", footer:"मदद करने के लिए बनाया गया। 💚"
+      }
+    };
+
+    const tools = [
+      {id:"words", icon:"📝", category:"writing", titleKey:"wordCount", descKey:"wordDesc"},
+      {id:"calculator", icon:"🧮", category:"daily", titleKey:"calculator", descKey:"calcDesc"},
+      {id:"notes", icon:"📒", category:"productivity", titleKey:"notes", descKey:"notesDesc"},
+      {id:"percentage", icon:"📊", category:"daily", titleKey:"percentage", descKey:"percentDesc"},
+      {id:"goals", icon:"✅", category:"productivity", titleKey:"goals", descKey:"goalsDesc"},
+      {id:"password", icon:"🔐", category:"daily", titleKey:"password", descKey:"passDesc"},
+      {id:"age", icon:"🎂", category:"daily", titleKey:"age", descKey:"ageDesc"},
+      {id:"converter", icon:"📏", category:"education", titleKey:"converter", descKey:"convDesc"},
+      {id:"study", icon:"📚", category:"education", titleKey:"study", descKey:"studyDesc"}
+    ];
+
+    const $ = selector => document.querySelector(selector);
+    let currentLanguage = "id";
+    let currentCategory = "all";
+    let currentQuery = "";
+
+    function tr(key) {
+      const current = translations[currentLanguage] || translations.id;
+      const extra = extraTranslations[currentLanguage] || {};
+      return extra[key] ?? current[key] ?? translations.id[key] ?? key;
+    }
+
+    function safeText(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+      })[char]);
+    }
+
+    function applyLanguage() {
+      const dict = {
+        ...translations.id,
+        ...(translations[currentLanguage] || {}),
+        ...(extraTranslations[currentLanguage] || {})
+      };
+
+      document.documentElement.lang = currentLanguage;
+      document.documentElement.dir = currentLanguage === "ar" ? "rtl" : "ltr";
+
+      document.querySelectorAll("[data-i18n]").forEach(element => {
+        const key = element.dataset.i18n;
+        if (dict[key] !== undefined) element.innerHTML = dict[key];
+      });
+
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
+        const key = element.dataset.i18nPlaceholder;
+        if (dict[key] !== undefined) element.placeholder = dict[key];
+      });
+
+      renderTools();
+    }
+
+    function renderTools() {
+      const filtered = tools.filter(tool => {
+        const matchesCategory = currentCategory === "all" || tool.category === currentCategory;
+        const searchable = (tr(tool.titleKey) + " " + tr(tool.descKey) + " " + tool.id).toLowerCase();
+        return matchesCategory && searchable.includes(currentQuery.toLowerCase());
+      });
+
+      $("#toolsGrid").innerHTML = filtered.map(tool => `
+        <article class="tool-card">
+          <div class="tool-icon">${tool.icon}</div>
+          <h3>${safeText(tr(tool.titleKey))}</h3>
+          <p>${safeText(tr(tool.descKey))}</p>
+          <a class="tool-link" href="#${tool.id}" data-open-tool="${tool.id}">
+            ${safeText(tr("use"))}
+          </a>
+        </article>
+      `).join("");
+
+      $("#emptyMessage").style.display = filtered.length ? "none" : "block";
+    }
+
+    $("#searchForm").addEventListener("submit", event => {
+      event.preventDefault();
+      currentQuery = $("#searchInput").value.trim();
+      renderTools();
+      $("#tools").scrollIntoView({behavior:"smooth"});
+    });
+
+    $("#categories").addEventListener("click", event => {
+      const button = event.target.closest("[data-category]");
+      if (!button) return;
+      currentCategory = button.dataset.category;
+      document.querySelectorAll(".category").forEach(item => item.classList.remove("active"));
+      button.classList.add("active");
+      renderTools();
+    });
+
+    $("#language").addEventListener("change", event => {
+      currentLanguage = event.target.value;
+      applyLanguage();
+    });
+
+    $("#themeButton").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      const dark = document.body.classList.contains("dark");
+      $("#themeButton").textContent = dark ? "☀️" : "🌙";
+    });
+
+    $("#year").textContent = new Date().getFullYear();
+
+    const modal = $("#toolModal");
+
+    function openTool(id) {
+      const tool = tools.find(item => item.id === id);
+      if (!tool) return;
+
+      $("#modalTitle").textContent = tr(tool.titleKey);
+      $("#modalDescription").textContent = tr(tool.descKey);
+      const body = $("#toolBody");
+      body.innerHTML = "";
+
+      if (id === "words") {
+        body.innerHTML = `
+          <div class="field">
+            <label for="wordInput">${tr("inputText")}</label>
+            <textarea id="wordInput" rows="7" placeholder="${tr("inputText")}"></textarea>
+          </div>
+          <div class="result" id="wordResult">
+            ${tr("count")}
+            <p>${tr("words")}: <strong id="wordTotal">0</strong></p>
+            <p>${tr("chars")}: <b id="charTotal">0</b></p>
+            <p>${tr("charsNoSpace")}: <b id="charNoSpace">0</b></p>
+          </div>
+          <button class="primary-button" id="copyText" style="margin-top:12px">${tr("copy")}</button>
+        `;
+        $("#wordInput").addEventListener("input", () => {
+          const value = $("#wordInput").value;
+          $("#wordTotal").textContent = value.trim() ? value.trim().split(/\s+/).length : 0;
+          $("#charTotal").textContent = value.length;
+          $("#charNoSpace").textContent = value.replace(/\s/g, "").length;
+        });
+        $("#copyText").addEventListener("click", () => copyText($("#wordInput").value));
+      }
+
+      if (id === "calculator") {
+        body.innerHTML = `
+          <div class="field"><label>${tr("firstNumber")}</label><input id="num1" type="number" step="any"></div>
+          <div class="field"><label>${tr("operator")}</label>
+            <select id="operator">
+              <option value="+">${tr("add")}</option>
+              <option value="-">${tr("subtract")}</option>
+              <option value="*">${tr("multiply")}</option>
+              <option value="/">${tr("divide")}</option>
+            </select>
+          </div>
+          <div class="field"><label>${tr("secondNumber")}</label><input id="num2" type="number" step="any"></div>
+          <button class="primary-button" id="calculate">${tr("calculate")}</button>
+          <div class="result" id="calcResult" aria-live="polite">${tr("result")}: —</div>
+        `;
+        $("#calculate").addEventListener("click", () => {
+          const a = Number($("#num1").value);
+          const b = Number($("#num2").value);
+          if ($("#num1").value === "" || $("#num2").value === "") {
+            $("#calcResult").textContent = tr("error"); return;
+          }
+          let result;
+          switch ($("#operator").value) {
+            case "+": result = a + b; break;
+            case "-": result = a - b; break;
+            case "*": result = a * b; break;
+            case "/":
+              if (b === 0) { $("#calcResult").textContent = "Tidak bisa membagi dengan nol."; return; }
+              result = a / b; break;
+          }
+          $("#calcResult").textContent = tr("result") + ": " + result;
+        });
+      }
+
+      if (id === "percentage") {
+        body.innerHTML = `
+          <div class="field"><label>${tr("percentOf")}</label><input id="percent" type="number" step="any" placeholder="10"></div>
+          <div class="field"><label>${tr("ofNumber")}</label><input id="percentBase" type="number" step="any" placeholder="200"></div>
+          <button class="primary-button" id="calculatePercent">${tr("calculate")}</button>
+          <div class="result" id="percentResult">${tr("result")}: —</div>
+        `;
+        $("#calculatePercent").addEventListener("click", () => {
+          const p = Number($("#percent").value);
+          const n = Number($("#percentBase").value);
+          if ($("#percent").value === "" || $("#percentBase").value === "") {
+            $("#percentResult").textContent = tr("error"); return;
+          }
+          $("#percentResult").textContent = tr("result") + ": " + (p / 100 * n);
+        });
+      }
+
+      if (id === "notes") {
+        body.innerHTML = `
+          <div class="field"><label>${tr("inputText")}</label><textarea id="notesInput" rows="8" placeholder="${tr("inputText")}"></textarea></div>
+          <button class="primary-button" id="saveNotes">${tr("save")}</button>
+          <button class="small-button" id="copyNotes">${tr("copy")}</button>
+          <p id="notesStatus" style="margin-top:10px;color:var(--primary)"></p>
+        `;
+        $("#notesInput").value = localStorage.getItem("bantudunia-notes") || "";
+        $("#saveNotes").addEventListener("click", () => {
+          localStorage.setItem("bantudunia-notes", $("#notesInput").value);
+          $("#notesStatus").textContent = tr("saved");
+        });
+        $("#copyNotes").addEventListener("click", () => copyText($("#notesInput").value));
+      }
+
+      if (id === "goals") {
+        body.innerHTML = `
+          <form id="taskForm" class="search-box">
+            <input id="taskInput" placeholder="${tr("taskPlaceholder")}" required>
+            <button class="primary-button">${tr("addTask")}</button>
+          </form>
+          <ul id="taskList" style="list-style:none;margin-top:18px"></ul>
+        `;
+        let tasks = [];
+        try { tasks = JSON.parse(localStorage.getItem("bantudunia-tasks") || "[]"); } catch {}
+        const drawTasks = () => {
+          $("#taskList").innerHTML = tasks.length ? tasks.map((task, index) => `
+            <li style="display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+              <input type="checkbox" data-check="${index}" ${task.done ? "checked" : ""}>
+              <span style="flex:1;overflow-wrap:anywhere;${task.done ? "text-decoration:line-through;opacity:.6" : ""}">${safeText(task.text)}</span>
+              <button class="small-button" data-delete="${index}" aria-label="Hapus tugas">✕</button>
+            </li>
+          `).join("") : `<p style="color:var(--muted)">${tr("emptyTasks")}</p>`;
+        };
+        drawTasks();
+        $("#taskForm").addEventListener("submit", event => {
+          event.preventDefault();
+          const value = $("#taskInput").value.trim();
+          if (!value) return;
+          tasks.push({text:value, done:false});
+          localStorage.setItem("bantudunia-tasks", JSON.stringify(tasks));
+          drawTasks();
+          $("#taskInput").value = "";
+        });
+        $("#taskList").addEventListener("change", event => {
+          if (event.target.dataset.check === undefined) return;
+          tasks[Number(event.target.dataset.check)].done = event.target.checked;
+          localStorage.setItem("bantudunia-tasks", JSON.stringify(tasks));
+          drawTasks();
+        });
+        $("#taskList").addEventListener("click", event => {
+          const button = event.target.closest("[data-delete]");
+          if (!button) return;
+          tasks.splice(Number(button.dataset.delete), 1);
+          localStorage.setItem("bantudunia-tasks", JSON.stringify(tasks));
+          drawTasks();
+        });
+      }
+
+      if (id === "password") {
+        body.innerHTML = `
+          <div class="field"><label>${tr("passLength")}</label><input id="passLength" type="number" min="8" max="64" value="16"></div>
+          <button class="primary-button" id="generatePassword">${tr("generate")}</button>
+          <div class="result"><textarea id="passwordResult" readonly aria-label="Kata sandi hasil"></textarea></div>
+          <button class="small-button" id="copyPassword" style="margin-top:10px">${tr("copy")}</button>
+          <p style="font-size:13px;color:var(--muted);margin-top:12px">${tr("strongNote")}</p>
+        `;
+        $("#generatePassword").addEventListener("click", () => {
+          const length = Number($("#passLength").value);
+          if (!Number.isInteger(length) || length < 8 || length > 64) {
+            $("#passwordResult").value = tr("error"); return;
+          }
+          const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*?";
+          const bytes = new Uint32Array(length);
+          crypto.getRandomValues(bytes);
+          $("#passwordResult").value = Array.from(bytes, byte => chars[byte % chars.length]).join("");
+        });
+        $("#copyPassword").addEventListener("click", () => copyText($("#passwordResult").value));
+      }
+
+      if (id === "age") {
+        body.innerHTML = `
+          <div class="field"><label>${tr("birthDate")}</label><input id="birthDate" type="date" max="${new Date().toISOString().slice(0,10)}"></div>
+          <button class="primary-button" id="calculateAge">${tr("calculate")}</button>
+          <div class="result" id="ageResult">${tr("todayAge")}: —</div>
+        `;
+        $("#calculateAge").addEventListener("click", () => {
+          const value = $("#birthDate").value;
+          if (!value) { $("#ageResult").textContent = tr("error"); return; }
+          const birth = new Date(value + "T00:00:00");
+          const today = new Date();
+          if (birth > today) { $("#ageResult").textContent = tr("error"); return; }
+          let age = today.getFullYear() - birth.getFullYear();
+          const birthdayNotReached = today.getMonth() < birth.getMonth() ||
+            (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate());
+          if (birthdayNotReached) age--;
+          $("#ageResult").textContent = tr("todayAge") + ": " + age;
+        });
+      }
+
+      if (id === "converter") {
+        body.innerHTML = `
+          <div class="field"><label>${tr("unit")}</label>
+            <select id="conversion">
+              <option value="km">${tr("kmM")}</option>
+              <option value="m">${tr("mCm")}</option>
+              <option value="kg">${tr("kgG")}</option>
+            </select>
+          </div>
+          <div class="field"><label>${tr("value")}</label><input id="convertValue" type="number" step="any" value="1"></div>
+          <button class="primary-button" id="convertButton">${tr("calculate")}</button>
+          <div class="result" id="convertResult">${tr("result")}: —</div>
+        `;
+        $("#convertButton").addEventListener("click", () => {
+          const value = $("#convertValue").value;
+          if (value === "") { $("#convertResult").textContent = tr("error"); return; }
+          const n = Number(value);
+          const conversion = $("#conversion").value;
+          const result = conversion === "km" ? `${n * 1000} m` :
+            conversion === "m" ? `${n * 100} cm` : `${n * 1000} g`;
+          $("#convertResult").textContent = tr("result") + ": " + result;
+        });
+      }
+
+      if (id === "study") {
+        body.innerHTML = `
+          <div class="field"><label>${tr("hours")}</label><input id="studyMinutes" type="number" min="1" max="600" value="25"></div>
+          <div class="field"><label>${tr("breakTime")}</label><input id="breakMinutes" type="number" min="0" max="120" value="5"></div>
+          <button class="primary-button" id="createStudyPlan">${tr("createPlan")}</button>
+          <div class="result" id="studyResult" aria-live="polite"></div>
+        `;
+        $("#createStudyPlan").addEventListener("click", () => {
+          const study = Number($("#studyMinutes").value);
+          const rest = Number($("#breakMinutes").value);
+          if (!Number.isInteger(study) || study < 1 || study > 600 ||
+              !Number.isInteger(rest) || rest < 0 || rest > 120) {
+            $("#studyResult").textContent = tr("error"); return;
+          }
+          $("#studyResult").innerHTML = `<b>${tr("planTitle")}</b><p style="margin-top:8px">📚 ${tr("hours")}: ${study}</p><p>☕ ${tr("breakTime")}: ${rest}</p><p style="margin-top:8px">1. Siapkan materi.</p><p>2. Belajar fokus selama ${study} menit.</p><p>3. Istirahat ${rest} menit.</p><p>4. Ulangi jika diperlukan.</p>`;
+        });
+      }
+
+      modal.classList.add("open");
+      $("#closeModal").focus();
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert(tr("copied"));
+      } catch {
+        alert("Tidak bisa menyalin otomatis. Silakan pilih dan salin teks secara manual.");
+      }
+    }
+
+    $("#toolsGrid").addEventListener("click", event => {
+      const link = event.target.closest("[data-open-tool]");
+      if (!link) return;
+      event.preventDefault();
+      openTool(link.dataset.openTool);
+    });
+
+    $("#closeModal").addEventListener("click", () => modal.classList.remove("open"));
+    modal.addEventListener("click", event => {
+      if (event.target === modal) modal.classList.remove("open");
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") modal.classList.remove("open");
+    });
+
+    applyLanguage();
+  </script>
+</body>
+</html>
