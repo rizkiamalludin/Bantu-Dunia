@@ -841,6 +841,8 @@
 
     const modal = $("#toolModal");
 
+    function formatIDR(value) { return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(value); }
+
     function openTool(id) {
       const tool = tools.find(item => item.id === id);
       if (!tool) return;
@@ -850,7 +852,147 @@
       const body = $("#toolBody");
       body.innerHTML = "";
 
-      if (id === "words") {
+
+      if (id === "currency") {
+        body.innerHTML = `
+          <p>Nilai di bawah menunjukkan berapa banyak mata uang yang setara dengan <b>1 USD</b>. Data diambil dari layanan kurs Frankfurter yang memakai data referensi bank sentral Eropa. Kurs referensi bukan selalu kurs jual/beli bank atau money changer.</p>
+          <div class="field" style="margin-top:14px">
+            <label for="currencyAmount">Jumlah</label>
+            <input id="currencyAmount" type="number" min="0" step="any" value="1">
+          </div>
+          <div class="field">
+            <label for="currencyFrom">Dari mata uang</label>
+            <select id="currencyFrom">
+              <option value="USD">USD — Dolar AS</option><option value="IDR">IDR — Rupiah Indonesia</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — Pound sterling</option><option value="JPY">JPY — Yen Jepang</option><option value="CNY">CNY — Yuan Tiongkok</option><option value="SGD">SGD — Dolar Singapura</option><option value="AUD">AUD — Dolar Australia</option><option value="INR">INR — Rupee India</option><option value="BRL">BRL — Real Brasil</option><option value="SAR">SAR — Riyal Saudi</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="currencyTo">Ke mata uang</label>
+            <select id="currencyTo">
+              <option value="IDR">IDR — Rupiah Indonesia</option><option value="USD">USD — Dolar AS</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — Pound sterling</option><option value="JPY">JPY — Yen Jepang</option><option value="CNY">CNY — Yuan Tiongkok</option><option value="SGD">SGD — Dolar Singapura</option><option value="AUD">AUD — Dolar Australia</option><option value="INR">INR — Rupee India</option><option value="BRL">BRL — Real Brasil</option><option value="SAR">SAR — Riyal Saudi</option>
+            </select>
+          </div>
+          <button class="primary-button" id="convertCurrency">Konversi</button>
+          <div class="result" id="currencyResult" aria-live="polite">Memuat kurs terbaru…</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap">
+            <h3 style="font-size:17px">Perubahan kurs harian</h3>
+            <button class="small-button" id="refreshRates">↻ Perbarui data</button>
+          </div>
+          <p class="status-line" id="ratesStatus">Mengambil data terbaru…</p>
+          <div class="rate-wrap" id="ratesTable"></div>
+          <p class="status-line">Catatan: pasar valuta asing berubah terus. Sumber kurs referensi biasanya diperbarui pada hari kerja, jadi akhir pekan atau hari libur mungkin tidak memiliki data baru. Perubahan dihitung dibandingkan data hari kerja sebelumnya yang tersedia.</p>
+        `;
+        let rateData = null;
+        const currencyNames = {USD:"Dolar AS",IDR:"Rupiah Indonesia",EUR:"Euro",GBP:"Pound sterling",JPY:"Yen Jepang",CNY:"Yuan Tiongkok",SGD:"Dolar Singapura",AUD:"Dolar Australia",INR:"Rupee India",BRL:"Real Brasil",SAR:"Riyal Saudi"};
+        const currencyCodes = Object.keys(currencyNames);
+        const formatMoney = (value, code) => new Intl.NumberFormat("id-ID", {style:"currency",currency:code,maximumFractionDigits: code === "IDR" || code === "JPY" ? 0 : 4}).format(value);
+        const showConversion = () => {
+          if (!rateData) { $("#currencyResult").textContent = "Kurs belum tersedia. Coba perbarui data."; return; }
+          const amount = Number($("#currencyAmount").value);
+          const from = $("#currencyFrom").value, to = $("#currencyTo").value;
+          if ($("#currencyAmount").value === "" || !Number.isFinite(amount) || amount < 0) { $("#currencyResult").textContent = "Masukkan jumlah yang valid."; return; }
+          const fromRate = from === "USD" ? 1 : rateData.latest[from];
+          const toRate = to === "USD" ? 1 : rateData.latest[to];
+          if (!fromRate || !toRate) { $("#currencyResult").textContent = "Kurs untuk mata uang ini belum tersedia."; return; }
+          const result = amount / fromRate * toRate;
+          $("#currencyResult").innerHTML = `<span>${safeText(formatMoney(amount,from))} kira-kira setara dengan</span><p style="font-size:23px;font-weight:800;margin-top:5px">${safeText(formatMoney(result,to))}</p><span>1 ${from} = ${safeText(formatMoney(toRate / fromRate,to))}</span>`;
+        };
+        const loadRates = async () => {
+          $("#ratesStatus").textContent = "Sedang mengambil kurs terbaru dari internet…";
+          $("#ratesTable").innerHTML = "";
+          try {
+            const end = new Date();
+            const start = new Date(end); start.setDate(start.getDate() - 12);
+            const iso = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+            const symbols = currencyCodes.filter(code => code !== "USD").join(",");
+            const url = "https://api.frankfurter.dev/v1/"+iso(start)+".."+iso(end)+"?base=USD&symbols="+symbols;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Kurs tidak tersedia");
+            const payload = await response.json();
+            const days = Object.keys(payload.rates || {}).sort();
+            if (!days.length) throw new Error("Data kosong");
+            const latestDay = days[days.length-1];
+            const previousDay = days.length > 1 ? days[days.length-2] : null;
+            rateData = {latest:{USD:1,...payload.rates[latestDay]}, previous:previousDay ? {USD:1,...payload.rates[previousDay]} : null, date:latestDay, previousDate:previousDay};
+            $("#ratesStatus").textContent = "Data terakhir: "+latestDay+(previousDay ? " · dibandingkan dengan "+previousDay : " · data pembanding belum tersedia");
+            $("#ratesTable").innerHTML = "<table class='rate-table'><thead><tr><th>Mata uang</th><th>Nilai per 1 USD</th><th>Perubahan harian</th></tr></thead><tbody>"+currencyCodes.map(code=>{
+              const rate=rateData.latest[code];
+              if (!rate) return "";
+              const prev=rateData.previous && rateData.previous[code];
+              const change=prev ? ((rate-prev)/prev*100) : null;
+              const changeText=change===null ? "—" : (change>0?"+":"")+change.toFixed(2)+"%";
+              const cls=change===null?"":change>0?"positive":change<0?"negative":"";
+              return "<tr><td><b>"+code+"</b><br><span style='color:var(--muted)'>"+currencyNames[code]+"</span></td><td>"+new Intl.NumberFormat("id-ID",{maximumFractionDigits:4}).format(rate)+"</td><td class='"+cls+"'>"+changeText+"</td></tr>";
+            }).join("")+"</tbody></table>";
+            showConversion();
+          } catch (error) {
+            $("#ratesStatus").textContent = "Gagal mengambil data. Periksa koneksi internet lalu coba lagi.";
+            $("#ratesTable").innerHTML = "<p class='status-line'>Data kurs tidak bisa dimuat sekarang. Coba tombol Perbarui Data beberapa saat lagi.</p>";
+            $("#currencyResult").textContent = "Kurs belum tersedia karena layanan data tidak dapat dihubungi.";
+          }
+        };
+        $("#convertCurrency").addEventListener("click", showConversion);
+        $("#currencyFrom").addEventListener("change", showConversion);
+        $("#currencyTo").addEventListener("change", showConversion);
+        $("#refreshRates").addEventListener("click", loadRates);
+        loadRates();
+      }
+
+      const resourcePages = {
+        learn: {heading:"BelajarGratis — belajar tanpa biaya", intro:"Mulai dari materi sekolah, penjelasan konsep, sampai latihan mandiri.", items:[
+          ["Khan Academy","Pelajaran matematika, sains, ekonomi, dan lainnya.","https://www.khanacademy.org/"],
+          ["CK-12","Materi STEM dan buku digital gratis.","https://www.ck12.org/"],
+          ["OpenStax","Buku ajar gratis, terutama tingkat sekolah menengah atas dan perguruan tinggi.","https://openstax.org/"]
+        ]},
+        languageHelp: {heading:"BahasaDunia — memahami bahasa", intro:"Gunakan beberapa sumber ini untuk belajar kosakata, tata bahasa, dan frasa sehari-hari.", items:[
+          ["Wiktionary","Kamus multibahasa yang bisa dibaca gratis.","https://www.wiktionary.org/"],
+          ["Forvo","Dengarkan pengucapan kata dari penutur berbagai bahasa.","https://forvo.com/"],
+          ["British Council LearnEnglish","Latihan bahasa Inggris gratis.","https://learnenglish.britishcouncil.org/"]
+        ]},
+        create: {heading:"BuatMudah — mulai berkarya", intro:"Sumber gratis atau punya opsi gratis. Periksa ketentuan tiap layanan sebelum mengunduh atau membagikan hasil.", items:[
+          ["Canva","Membuat poster, presentasi, dan desain; tersedia paket gratis.","https://www.canva.com/"],
+          ["Google Docs","Menulis dokumen dan surat secara online.","https://docs.google.com/"],
+          ["Europass CV","Membuat CV dengan format yang dikenal di Eropa.","https://europa.eu/europass/en/create-europass-cv"]
+        ]},
+        farming: {heading:"TaniBantu — pertanian praktis", intro:"Hitung perkiraan biaya, pendapatan, dan selisih hasil panen. Ini hanya perkiraan, bukan jaminan hasil.", items:[]},
+        aid: {heading:"BantuTemukan — cari bantuan tepercaya", intro:"Mulailah dari situs resmi dan selalu cek syarat, wilayah, serta tanggal pendaftaran. Jangan membayar biaya tidak jelas untuk menerima bantuan.", items:[
+          ["KIP Kuliah","Informasi resmi bantuan pendidikan tinggi Indonesia.","https://kip-kuliah.kemdiktisaintek.go.id/"],
+          ["Beasiswa LPDP","Informasi beasiswa dari LPDP.","https://lpdp.kemenkeu.go.id/"],
+          ["Cek Dinsos setempat","Untuk bantuan sosial daerah, cek situs atau kantor dinas sosial resmi di wilayahmu.","https://kemensos.go.id/"]
+        ]},
+        safety: {heading:"AmanDigital — lindungi diri di internet", intro:"Panduan dasar untuk mengurangi risiko penipuan dan pencurian akun.", items:[
+          ["Cek fakta Mafindo","Belajar memeriksa klaim dan informasi yang meragukan.","https://turnbackhoax.id/"],
+          ["Google Safety Center","Panduan privasi dan keamanan akun Google.","https://safety.google/"],
+          ["CISA Secure Our World","Tips mengenali phishing dan menjaga akun.","https://www.cisa.gov/secure-our-world"]
+        ]},
+        opportunities: {heading:"PeluangTerbuka — kesempatan berkembang", intro:"Gunakan situs resmi penyedia untuk memeriksa tenggat dan persyaratan terbaru.", items:[
+          ["Coursera","Kursus online; sebagian materi bisa diakses gratis, sertifikat bisa berbayar.","https://www.coursera.org/"],
+          ["edX","Kursus dari berbagai institusi; opsi dan biaya berbeda-beda.","https://www.edx.org/"],
+          ["Kampus Merdeka","Periksa program dan informasi resmi yang tersedia.","https://kampusmerdeka.kemdiktisaintek.go.id/"],
+          ["Karirhub Kemnaker","Portal resmi informasi kesempatan kerja Indonesia.","https://karirhub.kemnaker.go.id/"]
+        ]}
+      };
+      if (resourcePages[id]) {
+        const page = resourcePages[id];
+        body.innerHTML = "<h3 style='font-size:20px;margin-bottom:6px'>"+safeText(page.heading)+"</h3><p style='color:var(--muted);margin-bottom:10px'>"+safeText(page.intro)+"</p>";
+        if (id === "farming") {
+          body.innerHTML += `
+            <div class="field"><label for="farmCost">Total biaya tanam (Rp)</label><input id="farmCost" type="number" min="0" value="1000000"></div>
+            <div class="field"><label for="farmYield">Perkiraan hasil panen (kg)</label><input id="farmYield" type="number" min="0" value="500"></div>
+            <div class="field"><label for="farmPrice">Harga jual per kg (Rp)</label><input id="farmPrice" type="number" min="0" value="4000"></div>
+            <button class="primary-button" id="farmCalc">Hitung perkiraan</button><div class="result" id="farmResult">Isi data lalu hitung.</div>
+            <div class="resource-list">${page.items.map(item=>"<div class='resource-item'><h3>"+safeText(item[0])+"</h3><p>"+safeText(item[1])+"</p><a href='"+item[2]+"' target='_blank' rel='noopener noreferrer'>Baca sumber →</a></div>").join("")}</div>`;
+          $("#farmCalc").addEventListener("click",()=>{
+            const cost=Number($("#farmCost").value), yieldKg=Number($("#farmYield").value), price=Number($("#farmPrice").value);
+            if ([cost,yieldKg,price].some(v=>!Number.isFinite(v)||v<0) || $("#farmCost").value==="" || $("#farmYield").value==="" || $("#farmPrice").value==="") {$("#farmResult").textContent="Masukkan angka yang valid.";return;}
+            const revenue=yieldKg*price, profit=revenue-cost;
+            $("#farmResult").innerHTML="<p>Perkiraan pendapatan: <b>"+safeText(formatIDR(revenue))+"</b></p><p>Biaya: <b>"+safeText(formatIDR(cost))+"</b></p><p>Selisih: <b style='color:"+(profit>=0?"#16834a":"#c0392b")+"'>"+safeText(formatIDR(profit))+"</b></p><p style='font-size:12px;color:var(--muted)'>Belum termasuk biaya atau risiko yang belum dicatat.</p>";
+          });
+        } else {
+          body.innerHTML += "<div class='resource-list'>"+page.items.map(item=>"<div class='resource-item'><h3>"+safeText(item[0])+"</h3><p>"+safeText(item[1])+"</p><a href='"+item[2]+"' target='_blank' rel='noopener noreferrer'>Buka situs →</a></div>").join("")+"</div>";
+        }
+      }
+\n      if (id === "words") {
         body.innerHTML = `
           <div class="field">
             <label for="wordInput">${tr("inputText")}</label>
