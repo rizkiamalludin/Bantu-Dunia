@@ -1392,6 +1392,7 @@ html.site-dark body a{color:#93c5fd}
         const makeDocxPdf=async(file)=>{
           await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
           await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+          await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js");
           const zip=await JSZip.loadAsync(await file.arrayBuffer());
           const xmlFile=zip.file("word/document.xml");
           if(!xmlFile)throw new Error("Struktur dokumen Word tidak ditemukan.");
@@ -1399,10 +1400,10 @@ html.site-dark body a{color:#93c5fd}
           const xmlDoc=new DOMParser().parseFromString(xml,"application/xml");
           if(xmlDoc.querySelector("parsererror"))throw new Error("Isi dokumen Word tidak dapat dibaca.");
           const ns="http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-          const paragraphs=[...xmlDoc.getElementsByTagNameNS(ns,"p")].map(p=>{
+          const textOf=node=>{
             let value="";
-            const walk=node=>{
-              for(const child of node.childNodes){
+            const walk=n=>{
+              for(const child of n.childNodes){
                 if(child.nodeType!==1)continue;
                 if(child.namespaceURI===ns&&child.localName==="t")value+=child.textContent||"";
                 else if(child.namespaceURI===ns&&child.localName==="tab")value+="    ";
@@ -1410,28 +1411,45 @@ html.site-dark body a{color:#93c5fd}
                 else walk(child);
               }
             };
-            walk(p);
+            walk(node);
             return value.replace(/[\\t ]+$/g,"");
-          });
-          if(!paragraphs.some(x=>x.trim()))throw new Error("Tidak ada teks yang bisa dikonversi dari dokumen ini.");
+          };
+          const body=xmlDoc.getElementsByTagNameNS(ns,"body")[0];
+          if(!body)throw new Error("Isi dokumen Word tidak ditemukan.");
+          const blocks=[...body.children].filter(el=>el.namespaceURI===ns&&(el.localName==="p"||el.localName==="tbl"));
+          if(!blocks.length)throw new Error("Dokumen Word tidak memiliki isi yang bisa dikonversi.");
           const {jsPDF}=window.jspdf;
           const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
-          const margin=18,pageWidth=210,pageHeight=297,lineHeight=6;
-          const maxWidth=pageWidth-margin*2;
-          let y=margin;
-          pdf.setFont("helvetica","normal");
-          pdf.setFontSize(11);
-          for(const paragraph of paragraphs){
-            if(!paragraph.trim()){y+=3;continue;}
-            const safe=paragraph.replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,"-").replace(/…/g,"...");
-            const lines=pdf.splitTextToSize(safe,maxWidth);
-            for(const line of lines){
-              if(y>pageHeight-margin){pdf.addPage();y=margin;}
-              pdf.text(line,margin,y);
-              y+=lineHeight;
+          const margin=15,pageWidth=210,pageHeight=297,lineHeight=5.5,maxWidth=pageWidth-margin*2;
+          let y=margin,hasContent=false;
+          pdf.setFont("helvetica","normal");pdf.setFontSize(10.5);
+          const safeText=value=>value.replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,"-").replace(/…/g,"...");
+          for(const block of blocks){
+            if(block.localName==="p"){
+              const value=textOf(block);
+              if(!value.trim()){y+=2;continue;}
+              const lines=pdf.splitTextToSize(safeText(value),maxWidth);
+              for(const line of lines){
+                if(y>pageHeight-margin){pdf.addPage();y=margin;}
+                pdf.text(line,margin,y);y+=lineHeight;
+              }
+              y+=2;hasContent=true;
+            }else if(block.localName==="tbl"){
+              const rows=[...block.getElementsByTagNameNS(ns,"tr")].map(tr=>
+                [...tr.children].filter(cell=>cell.namespaceURI===ns&&cell.localName==="tc").map(tc=>{
+                  const value=[...tc.getElementsByTagNameNS(ns,"p")].map(textOf).filter(Boolean).join("\n");
+                  const span=tc.getElementsByTagNameNS(ns,"gridSpan")[0];
+                  const colSpan=span?Math.max(1,Number(span.getAttributeNS(ns,"val"))||1):1;
+                  return colSpan>1?{content:safeText(value),colSpan}:{content:safeText(value)};
+                })
+              ).filter(row=>row.length);
+              if(!rows.length)continue;
+              if(y>pageHeight-35){pdf.addPage();y=margin;}
+              pdf.autoTable({body:rows,startY:y,margin:{left:margin,right:margin,top:margin,bottom:margin},theme:"grid",styles:{font:"helvetica",fontSize:8,cellPadding:2,overflow:"linebreak",valign:"middle",lineColor:[120,120,120],lineWidth:.15},headStyles:{fillColor:[235,235,235],textColor:[20,20,20]},didDrawPage:()=>{},rowPageBreak:"auto"});
+              y=pdf.lastAutoTable.finalY+5;hasContent=true;
             }
-            y+=2;
           }
+          if(!hasContent)throw new Error("Tidak ada teks atau tabel yang bisa dikonversi dari dokumen ini.");
           const blob=pdf.output("blob");
           if(!blob||blob.size<500)throw new Error("PDF gagal dibuat. Silakan coba lagi.");
           return blob;
