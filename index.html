@@ -550,7 +550,6 @@ html.site-dark body a{color:#93c5fd}
           <option value="zh">🇨🇳 中文</option>
           <option value="hi">🇮🇳 हिन्दी</option>
         </select>
-        <button class="small-button" id="themeButton" aria-label="Ganti tema">🌙</button>
       </div>
     </div>
   </header>
@@ -939,12 +938,6 @@ html.site-dark body a{color:#93c5fd}
     $("#language").addEventListener("change", event => {
       currentLanguage = event.target.value;
       applyLanguage();
-    });
-
-    $("#themeButton").addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-      const dark = document.body.classList.contains("dark");
-      $("#themeButton").textContent = dark ? "☀️" : "🌙";
     });
 
     $("#year").textContent = new Date().getFullYear();
