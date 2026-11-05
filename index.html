@@ -798,16 +798,16 @@ html.site-dark body a{color:#93c5fd}
       {id:"aid", icon:"🤝", category:"daily", titleKey:"aidTitle", descKey:"aidDesc"},
       {id:"safety", icon:"🛡️", category:"daily", titleKey:"safetyTitle", descKey:"safetyDesc"},
       {id:"opportunities", icon:"🚀", category:"education", titleKey:"opportunitiesTitle", descKey:"opportunitiesDesc"},
-      {id:"pdf-tools",icon:"📄",category:"files",title:"Alat PDF",desc:"Gabungkan, pisahkan, susun, dan optimalkan dokumen PDF.",status:"planned"},
-      {id:"document-convert",icon:"🗂️",category:"files",title:"Konversi dokumen",desc:"Konversi format dokumen yang kompatibel seperti DOCX, PDF, XLSX, dan PPTX.",status:"planned"},
-      {id:"file-compress",icon:"🗜️",category:"files",title:"Kompres file",desc:"Perkecil ukuran file dengan menjaga format aslinya jika memungkinkan.",status:"planned"},
-      {id:"image-tools",icon:"🖼️",category:"creative",title:"Pengolah gambar",desc:"Kompres, ubah ukuran, dan konversi JPG, PNG, serta WebP.",status:"planned"},
-      {id:"budget-tools",icon:"💳",category:"finance",title:"Anggaran pribadi",desc:"Catat pemasukan, pengeluaran, dan rencana anggaran sederhana.",status:"planned"},
-      {id:"business-tools",icon:"📈",category:"finance",title:"Kalkulator usaha",desc:"Hitung modal, biaya, harga jual, omzet, dan perkiraan laba.",status:"planned"},
-      {id:"farm-planner",icon:"🌱",category:"business",title:"Asisten pertanian",desc:"Rencana tanam, catatan panen, kebutuhan produksi, dan perhitungan usaha tani.",status:"planned"},
-      {id:"small-business",icon:"🏪",category:"business",title:"Manajemen usaha kecil",desc:"Kelola stok, daftar produk, pesanan, dan catatan penjualan.",status:"planned"},
-      {id:"public-services",icon:"🏛️",category:"community",title:"Panduan layanan publik",desc:"Panduan administrasi dan informasi layanan masyarakat dari sumber tepercaya.",status:"planned"},
-      {id:"accessibility",icon:"♿",category:"community",title:"Aksesibilitas digital",desc:"Alat bantu agar layanan digital lebih mudah digunakan banyak orang.",status:"planned"},
+      {id:"pdf-tools",icon:"📄",category:"files",title:"Alat PDF",desc:"Gabungkan, pisahkan, susun, dan optimalkan dokumen PDF."},
+      {id:"document-convert",icon:"🗂️",category:"files",title:"Konversi dokumen",desc:"Konversi format dokumen yang kompatibel seperti DOCX, PDF, XLSX, dan PPTX."},
+      {id:"file-compress",icon:"🗜️",category:"files",title:"Kompres file",desc:"Perkecil ukuran file dengan menjaga format aslinya jika memungkinkan."},
+      {id:"image-tools",icon:"🖼️",category:"creative",title:"Pengolah gambar",desc:"Kompres, ubah ukuran, dan konversi JPG, PNG, serta WebP."},
+      {id:"budget-tools",icon:"💳",category:"finance",title:"Anggaran pribadi",desc:"Catat pemasukan, pengeluaran, dan rencana anggaran sederhana."},
+      {id:"business-tools",icon:"📈",category:"finance",title:"Kalkulator usaha",desc:"Hitung modal, biaya, harga jual, omzet, dan perkiraan laba."},
+      {id:"farm-planner",icon:"🌱",category:"business",title:"Asisten pertanian",desc:"Rencana tanam, catatan panen, kebutuhan produksi, dan perhitungan usaha tani."},
+      {id:"small-business",icon:"🏪",category:"business",title:"Manajemen usaha kecil",desc:"Kelola stok, daftar produk, pesanan, dan catatan penjualan."},
+      {id:"public-services",icon:"🏛️",category:"community",title:"Panduan layanan publik",desc:"Panduan administrasi dan informasi layanan masyarakat dari sumber tepercaya."},
+      {id:"accessibility",icon:"♿",category:"community",title:"Aksesibilitas digital",desc:"Alat bantu agar layanan digital lebih mudah digunakan banyak orang."},
     ];
 
     const $ = selector => document.querySelector(selector);
@@ -862,9 +862,8 @@ html.site-dark body a{color:#93c5fd}
           <div class="tool-icon">${tool.icon}</div>
           <h3>${safeText(tool.title || tr(tool.titleKey))}</h3>
           <p>${safeText(tool.desc || tr(tool.descKey))}</p>
-          ${tool.status ? '<span class="tool-status">Dalam pengembangan</span><br>' : ""}
           <a class="tool-link" href="#${tool.id}" data-open-tool="${tool.id}">
-            ${tool.status ? "Lihat rencana" : safeText(tr("use"))}
+            ${safeText(tr("use"))}
           </a>
         </article>
       `).join("");
@@ -914,9 +913,7 @@ html.site-dark body a{color:#93c5fd}
       const body = $("#toolBody");
       body.innerHTML = "";
 
-      if (tool.status === "planned") {
-        body.innerHTML = `<div class="result"><strong style="font-size:18px">Layanan ini masuk rencana pengembangan Bantu Dunia.</strong><p style="margin-top:9px">Fitur belum aktif dan belum bisa memproses file atau data. Saat dibangun, kami akan memilih teknologi yang sesuai dengan format dan kemampuan perangkat agar hasilnya aman dan tidak merusak file asli.</p><p style="margin-top:9px;font-size:13px;color:var(--muted)">Tidak semua format dapat dikonversi satu sama lain. Dukungan akan ditentukan berdasarkan kompatibilitas dan kualitas hasil.</p></div>`;
-      } else if (id === "currency") {
+      if (id === "currency") {
         body.innerHTML = `
           <p>Nilai di bawah menunjukkan berapa banyak mata uang yang setara dengan <b>1 USD</b>. Data diambil dari layanan kurs Frankfurter yang memakai data referensi bank sentral Eropa. Kurs referensi bukan selalu kurs jual/beli bank atau money changer.</p>
           <div class="field" style="margin-top:14px">
@@ -1189,26 +1186,6 @@ html.site-dark body a{color:#93c5fd}
         });
       }
 
-      if (id === "password") {
-        body.innerHTML = `
-          <div class="field"><label>${tr("passLength")}</label><input id="passLength" type="number" min="8" max="64" value="16"></div>
-          <button class="primary-button" id="generatePassword">${tr("generate")}</button>
-          <div class="result"><textarea id="passwordResult" readonly aria-label="Kata sandi hasil"></textarea></div>
-          <button class="small-button" id="copyPassword" style="margin-top:10px">${tr("copy")}</button>
-          <p style="font-size:13px;color:var(--muted);margin-top:12px">${tr("strongNote")}</p>
-        `;
-        $("#generatePassword").addEventListener("click", () => {
-          const length = Number($("#passLength").value);
-          if (!Number.isInteger(length) || length < 8 || length > 64) {
-            $("#passwordResult").value = tr("error"); return;
-          }
-          const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*?";
-          const bytes = new Uint32Array(length);
-          crypto.getRandomValues(bytes);
-          $("#passwordResult").value = Array.from(bytes, byte => chars[byte % chars.length]).join("");
-        });
-        $("#copyPassword").addEventListener("click", () => copyText($("#passwordResult").value));
-      }
 
       if (id === "age") {
         body.innerHTML = `
@@ -1272,6 +1249,49 @@ html.site-dark body a{color:#93c5fd}
         });
       }
 
+
+      if (id === "image-tools") {
+        body.innerHTML=`<p>Ubah ukuran dan format gambar langsung di browser. File tidak diunggah ke server.</p><div class="field"><label>Gambar</label><input id="imFile" type="file" accept="image/*"></div><div class="field"><label>Lebar (px)</label><input id="imW" type="number" min="1" placeholder="Ukuran asli"></div><div class="field"><label>Tinggi (px)</label><input id="imH" type="number" min="1" placeholder="Ikuti rasio asli"></div><div class="field"><label>Format</label><select id="imFmt"><option value="image/webp">WebP</option><option value="image/jpeg">JPG</option><option value="image/png">PNG</option></select></div><button class="primary-button" id="imGo">Proses &amp; unduh</button><div class="result" id="imOut">Pilih gambar.</div>`;
+        $("#imGo").addEventListener("click",()=>{const f=$("#imFile").files[0];if(!f){$("#imOut").textContent="Pilih gambar dulu.";return;}const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const w=Number($("#imW").value)||im.naturalWidth,h=Number($("#imH").value)||Math.round(im.naturalHeight*w/im.naturalWidth);if(w>10000||h>10000){$("#imOut").textContent="Maksimal 10.000 px.";URL.revokeObjectURL(u);return;}const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);c.toBlob(b=>{if(!b){$("#imOut").textContent="Gagal membuat gambar.";return;}const out=URL.createObjectURL(b),a=document.createElement("a");a.href=out;a.download="bantudunia-hasil."+(b.type==="image/png"?"png":b.type==="image/jpeg"?"jpg":"webp");a.textContent="Unduh hasil ("+(b.size/1024).toFixed(1)+" KB)";$("#imOut").innerHTML="<p>Berhasil diproses: "+w+" × "+h+" px</p>";$("#imOut").appendChild(a);URL.revokeObjectURL(u);},$("#imFmt").value,.85);};im.onerror=()=>$("#imOut").textContent="File gambar tidak terbaca.";im.src=u;});
+      }
+      if (id === "budget-tools") {
+        const key="bd-budget-v1";let data=[];try{data=JSON.parse(localStorage.getItem(key)||"[]");if(!Array.isArray(data))data=[];}catch{}
+        body.innerHTML=`<p>Catat pemasukan dan pengeluaran. Catatan hanya tersimpan di browser ini.</p><div class="field"><label>Keterangan</label><input id="bgName" maxlength="80"></div><div class="field"><label>Jenis</label><select id="bgType"><option value="in">Pemasukan</option><option value="out">Pengeluaran</option></select></div><div class="field"><label>Jumlah (Rp)</label><input id="bgAmount" type="number" min="1"></div><button class="primary-button" id="bgAdd">Tambah</button><div class="result" id="bgSum"></div><div id="bgList"></div><button class="small-button" id="bgClear">Hapus semua</button>`;
+        const draw=()=>{const inc=data.filter(x=>x.t==="in").reduce((s,x)=>s+x.a,0),out=data.filter(x=>x.t==="out").reduce((s,x)=>s+x.a,0);$("#bgSum").innerHTML="Pemasukan: <b>"+formatIDR(inc)+"</b><br>Pengeluaran: <b>"+formatIDR(out)+"</b><br>Saldo: <b>"+formatIDR(inc-out)+"</b>";$("#bgList").innerHTML=data.map((x,i)=>"<div class='resource-item'>"+safeText(x.n)+" · "+(x.t==="in"?"Masuk":"Keluar")+" · "+formatIDR(x.a)+" <button class='small-button' data-bgdel='"+i+"'>Hapus</button></div>").join("")||"Belum ada catatan.";};
+        $("#bgAdd").addEventListener("click",()=>{const n=$("#bgName").value.trim(),a=Number($("#bgAmount").value);if(!n||!Number.isSafeInteger(a)||a<=0){alert("Isi keterangan dan nominal yang valid.");return;}data.unshift({n,t:$("#bgType").value,a});localStorage.setItem(key,JSON.stringify(data));draw();$("#bgName").value="";$("#bgAmount").value="";});
+        $("#bgList").addEventListener("click",e=>{const b=e.target.closest("[data-bgdel]");if(!b)return;data.splice(+b.dataset.bgdel,1);localStorage.setItem(key,JSON.stringify(data));draw();});
+        $("#bgClear").addEventListener("click",()=>{if(confirm("Hapus semua catatan?")){data=[];localStorage.removeItem(key);draw();}});draw();
+      }
+      if (id === "business-tools") {
+        body.innerHTML=`<p>Hitung biaya per produk, harga jual berdasarkan margin, dan perkiraan laba.</p><div class="field"><label>Total biaya produksi (Rp)</label><input id="bcost" type="number" min="0" value="100000"></div><div class="field"><label>Jumlah produk</label><input id="bqty" type="number" min="1" value="10"></div><div class="field"><label>Target margin (%)</label><input id="bmargin" type="number" min="0" max="99.9" step=".1" value="20"></div><button class="primary-button" id="bcalc">Hitung</button><div class="result" id="bout"></div>`;
+        $("#bcalc").addEventListener("click",()=>{const c=Number($("#bcost").value),q=Number($("#bqty").value),m=Number($("#bmargin").value);if(!Number.isFinite(c)||c<0||!Number.isInteger(q)||q<1||!Number.isFinite(m)||m<0||m>=100){$("#bout").textContent="Periksa input. Margin harus di bawah 100%.";return;}const unit=c/q,p=unit/(1-m/100),rev=p*q;$("#bout").innerHTML="Biaya/unit: <b>"+formatIDR(unit)+"</b><br>Harga jual/unit: <b>"+formatIDR(p)+"</b><br>Perkiraan omzet: <b>"+formatIDR(rev)+"</b><br>Perkiraan laba: <b>"+formatIDR(rev-c)+"</b><small>Belum termasuk pajak dan biaya lain yang belum dicatat.</small>";});
+      }
+      if (id === "farm-planner") {
+        const key="bd-farm-v1";let rows=[];try{rows=JSON.parse(localStorage.getItem(key)||"[]");if(!Array.isArray(rows))rows=[];}catch{}
+        body.innerHTML=`<p>Catat rencana tanam dan hitung perkiraan hasil. Bukan jaminan hasil panen.</p><div class="field"><label>Komoditas</label><input id="fcrop"></div><div class="field"><label>Biaya total (Rp)</label><input id="fcost" type="number" min="0"></div><div class="field"><label>Perkiraan panen (kg)</label><input id="fyield" type="number" min="0" step="any"></div><div class="field"><label>Harga jual/kg (Rp)</label><input id="fprice" type="number" min="0"></div><button class="primary-button" id="fsave">Simpan hitungan</button><div class="result" id="fresult"></div><div id="flist"></div>`;
+        const draw=()=>$("#flist").innerHTML=rows.map(x=>"<div class='resource-item'><b>"+safeText(x.crop)+"</b><p>Omzet "+formatIDR(x.y*x.p)+" · Selisih "+formatIDR(x.y*x.p-x.c)+"</p></div>").join("")||"Belum ada catatan.";
+        $("#fsave").addEventListener("click",()=>{const crop=$("#fcrop").value.trim(),c=Number($("#fcost").value),y=Number($("#fyield").value),p=Number($("#fprice").value);if(!crop||[c,y,p].some(v=>!Number.isFinite(v)||v<0)){alert("Lengkapi data dengan benar.");return;}rows.unshift({crop,c,y,p});localStorage.setItem(key,JSON.stringify(rows));$("#fresult").textContent="Perkiraan omzet "+formatIDR(y*p)+"; selisih setelah biaya "+formatIDR(y*p-c)+". Catatan tersimpan.";draw();});draw();
+      }
+      if (id === "small-business") {
+        const key="bd-stock-v1";let rows=[];try{rows=JSON.parse(localStorage.getItem(key)||"[]");if(!Array.isArray(rows))rows=[];}catch{}
+        body.innerHTML=`<p>Daftar stok dan nilai modal barang sederhana. Data tersimpan di browser.</p><div class="field"><label>Nama produk</label><input id="sn"></div><div class="field"><label>Jumlah stok</label><input id="sq" type="number" min="0" step="1"></div><div class="field"><label>Modal/unit (Rp)</label><input id="sc" type="number" min="0"></div><div class="field"><label>Harga jual/unit (Rp)</label><input id="sp" type="number" min="0"></div><button class="primary-button" id="sa">Tambah produk</button><div class="result" id="ss"></div><div id="sl"></div>`;
+        const draw=()=>{$("#ss").textContent="Nilai modal stok: "+formatIDR(rows.reduce((s,x)=>s+x.q*x.c,0));$("#sl").innerHTML=rows.map((x,i)=>"<div class='resource-item'><b>"+safeText(x.n)+"</b><p>Stok "+x.q+" · Potensi laba "+formatIDR((x.p-x.c)*x.q)+"</p><button class='small-button' data-sd='"+i+"'>Hapus</button></div>").join("")||"Belum ada produk.";};
+        $("#sa").addEventListener("click",()=>{const n=$("#sn").value.trim(),q=Number($("#sq").value),c=Number($("#sc").value),p=Number($("#sp").value);if(!n||!Number.isInteger(q)||q<0||[c,p].some(v=>!Number.isSafeInteger(v)||v<0)){alert("Periksa data produk.");return;}rows.push({n,q,c,p});localStorage.setItem(key,JSON.stringify(rows));draw();$("#sn").value="";});
+        $("#sl").addEventListener("click",e=>{const b=e.target.closest("[data-sd]");if(!b)return;rows.splice(+b.dataset.sd,1);localStorage.setItem(key,JSON.stringify(rows));draw();});draw();
+      }
+      if (id === "accessibility") {
+        body.innerHTML=`<p>Perbesar teks dan bacakan teks dengan fitur suara browser jika tersedia.</p><div class="field"><label>Ukuran teks</label><input id="asize" type="range" min="14" max="24" value="16"><span id="aslabel">16 px</span></div><div class="field"><label>Teks untuk dibacakan</label><textarea id="aread" rows="4"></textarea></div><button class="primary-button" id="aspeak">Bacakan</button> <button class="small-button" id="astop">Hentikan</button><div class="result" id="astatus">Siap.</div>`;
+        $("#asize").addEventListener("input",e=>{document.body.style.fontSize=e.target.value+"px";$("#aslabel").textContent=e.target.value+" px";});
+        $("#aspeak").addEventListener("click",()=>{const t=$("#aread").value.trim();if(!t){$("#astatus").textContent="Masukkan teks.";return;}if(!("speechSynthesis" in window)){ $("#astatus").textContent="Browser tidak mendukung pembacaan suara.";return;}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="id-ID";speechSynthesis.speak(u);$("#astatus").textContent="Sedang membaca…";});
+        $("#astop").addEventListener("click",()=>{if("speechSynthesis" in window)speechSynthesis.cancel();$("#astatus").textContent="Dihentikan.";});
+      }
+      if (id === "public-services") {
+        body.innerHTML=`<p>Pintasan layanan resmi. Periksa alamat situs dan jangan pernah membagikan OTP, PIN, atau kata sandi.</p><div class="resource-list"><div class="resource-item"><b>Dukcapil</b><p>Administrasi kependudukan.</p><a href="https://dukcapil.kemendagri.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div><div class="resource-item"><b>Kemensos</b><p>Informasi bantuan sosial.</p><a href="https://kemensos.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div><div class="resource-item"><b>DJP</b><p>Informasi perpajakan.</p><a href="https://www.pajak.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div><div class="resource-item"><b>Kemenkes</b><p>Informasi kesehatan.</p><a href="https://www.kemkes.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div><div class="resource-item"><b>SP4N-LAPOR!</b><p>Pengaduan pelayanan publik.</p><a href="https://www.lapor.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div></div>`;
+      }
+      if (id === "pdf-tools" || id === "file-compress" || id === "document-convert") {
+        body.innerHTML=`<p>Untuk menjaga keamanan dan kualitas, fitur ini saat ini mendukung pengolahan gambar dan ekspor teks sederhana. Penggabungan PDF serta konversi DOCX/XLSX/PPTX belum tersedia.</p><div class="field"><label>Pilih file gambar atau teks</label><input id="localFile" type="file" accept="image/*,.txt,.md,.csv"></div><div class="field"><label>Tindakan</label><select id="localAction"><option value="text">Ekspor TXT</option><option value="image">Kompres gambar WebP</option></select></div><button class="primary-button" id="localRun">Proses &amp; unduh</button><div class="result" id="localOut"></div>`;
+        $("#localRun").addEventListener("click",async()=>{const f=$("#localFile").files[0],a=$("#localAction").value;if(!f){$("#localOut").textContent="Pilih file.";return;}try{let b,n;if(a==="image"){if(!f.type.startsWith("image/"))throw Error("Pilih file gambar.");const u=URL.createObjectURL(f),im=new Image();await new Promise((ok,no)=>{im.onload=ok;im.onerror=no;im.src=u;});const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);b=await new Promise(ok=>c.toBlob(ok,"image/webp",.75));URL.revokeObjectURL(u);n="gambar-webp.webp";}else{if(f.size>5e6)throw Error("File maksimal 5 MB.");b=new Blob([await f.text()],{type:"text/plain;charset=utf-8"});n="dokumen.txt";}if(!b)throw Error("Tidak dapat memproses file.");const u=URL.createObjectURL(b),link=document.createElement("a");link.href=u;link.download=n;link.click();setTimeout(()=>URL.revokeObjectURL(u),1000);$("#localOut").textContent="Selesai. Ukuran hasil "+(b.size/1024).toFixed(1)+" KB."; }catch(e){$("#localOut").textContent=e.message||"Gagal memproses file.";}});
+      }
       modal.classList.add("open");
       $("#closeModal").focus();
     }
