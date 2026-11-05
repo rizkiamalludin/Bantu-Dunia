@@ -799,7 +799,7 @@ html.site-dark body a{color:#93c5fd}
       {id:"safety", icon:"🛡️", category:"daily", titleKey:"safetyTitle", descKey:"safetyDesc"},
       {id:"opportunities", icon:"🚀", category:"education", titleKey:"opportunitiesTitle", descKey:"opportunitiesDesc"},
       {id:"pdf-tools",icon:"📄",category:"files",title:"Ekspor file teks",desc:"Simpan file teks sederhana sebagai TXT dari browser."},
-      {id:"document-convert",icon:"🗂️",category:"files",title:"Konversi teks sederhana",desc:"Ekspor file teks sederhana ke format TXT; format Office belum didukung."},
+      {id:"document-convert",icon:"🔄",category:"files",title:"Pusat Konversi File",desc:"Konversi Word, PDF, Excel, CSV, teks, HTML, dan gambar."},
       {id:"file-compress",icon:"🗜️",category:"files",title:"Kompres gambar",desc:"Perkecil ukuran gambar dan simpan sebagai WebP di browser."},
       {id:"image-tools",icon:"🖼️",category:"creative",title:"Pengolah gambar",desc:"Kompres, ubah ukuran, dan konversi JPG, PNG, serta WebP."},
       {id:"budget-tools",icon:"💳",category:"finance",title:"Anggaran pribadi",desc:"Catat pemasukan, pengeluaran, dan rencana anggaran sederhana."},
@@ -1288,8 +1288,84 @@ html.site-dark body a{color:#93c5fd}
       if (id === "public-services") {
         body.innerHTML=`<p>Pintasan layanan resmi. Periksa alamat situs dan jangan pernah membagikan OTP, PIN, atau kata sandi.</p><div class="resource-list"><div class="resource-item"><b>Dukcapil</b><p>Administrasi kependudukan.</p><a href="https://dukcapil.kemendagri.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div><div class="resource-item"><b>Kemensos</b><p>Informasi bantuan sosial.</p><a href="https://kemensos.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div><div class="resource-item"><b>DJP</b><p>Informasi perpajakan.</p><a href="https://www.pajak.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div><div class="resource-item"><b>Kemenkes</b><p>Informasi kesehatan.</p><a href="https://www.kemkes.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div><div class="resource-item"><b>SP4N-LAPOR!</b><p>Pengaduan pelayanan publik.</p><a href="https://www.lapor.go.id/" target="_blank" rel="noopener noreferrer">Buka situs resmi →</a></div></div>`;
       }
-      if (id === "pdf-tools" || id === "file-compress" || id === "document-convert") {
-        body.innerHTML=`<p>Untuk menjaga keamanan dan kualitas, fitur ini saat ini mendukung pengolahan gambar dan ekspor teks sederhana. Penggabungan PDF serta konversi DOCX/XLSX/PPTX belum tersedia.</p><div class="field"><label>Pilih file gambar atau teks</label><input id="localFile" type="file" accept="image/*,.txt,.md,.csv"></div><div class="field"><label>Tindakan</label><select id="localAction"><option value="text">Ekspor TXT</option><option value="image">Kompres gambar WebP</option></select></div><button class="primary-button" id="localRun">Proses &amp; unduh</button><div class="result" id="localOut"></div>`;
+
+      if (id === "document-convert") {
+        body.innerHTML=`
+          <p>Konversi dokumen langsung dari browser. Untuk menjaga privasi, file diproses di perangkatmu. Beberapa format kompleks dapat berubah tata letaknya.</p>
+          <div class="field"><label for="convertFile">Pilih file</label><input id="convertFile" type="file" accept=".docx,.pdf,.xlsx,.xls,.csv,.txt,.md,.html,.htm,.json,.png,.jpg,.jpeg,.webp"></div>
+          <div class="field"><label for="convertAction">Ubah menjadi</label><select id="convertAction">
+            <option value="word-pdf">Word (.docx) → PDF</option>
+            <option value="word-txt">Word (.docx) → TXT</option>
+            <option value="pdf-txt">PDF → TXT</option>
+            <option value="excel-csv">Excel (.xlsx/.xls) → CSV</option>
+            <option value="csv-excel">CSV → Excel (.xlsx)</option>
+            <option value="text-pdf">TXT/HTML → PDF</option>
+            <option value="text-html">TXT → HTML</option>
+            <option value="image-webp">Gambar → WebP</option>
+            <option value="image-jpg">Gambar → JPG</option>
+            <option value="image-png">Gambar → PNG</option>
+          </select></div>
+          <div class="result" id="convertNotice">Pilih file dan jenis konversi.</div>
+          <button class="primary-button" id="convertStart">Konversi file</button>
+          <p class="status-line">Catatan: Word ke PDF dibuat dari isi teks dan dapat mengubah tata letak. Untuk dokumen penting, periksa kembali hasilnya. File tidak diunggah oleh alat ini.</p>`;
+        const status=$("#convertNotice");
+        const loadScript=src=>new Promise((resolve,reject)=>{
+          const existing=[...document.scripts].find(s=>s.src===src);
+          if(existing){if(existing.dataset.loaded==="yes"){resolve();return;}existing.addEventListener("load",resolve,{once:true});existing.addEventListener("error",reject,{once:true});return;}
+          const s=document.createElement("script");s.src=src;s.async=true;s.onload=()=>{s.dataset.loaded="yes";resolve();};s.onerror=()=>reject(new Error("Pustaka konversi gagal dimuat. Periksa koneksi internet."));document.head.appendChild(s);
+        });
+        const download=(blob,name)=>{const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);};
+        const printHtml=html=>{const w=window.open("","_blank");if(!w)throw new Error("Popup diblokir. Izinkan popup untuk mencetak PDF.");w.document.open();w.document.write(html);w.document.close();w.onload=()=>{w.focus();w.print();};};
+        $("#convertStart").addEventListener("click",async()=>{
+          const f=$("#convertFile").files[0],action=$("#convertAction").value;
+          if(!f){status.textContent="Pilih file terlebih dahulu.";return;}
+          const ext=(f.name.split(".").pop()||"").toLowerCase();
+          status.textContent="Sedang memproses…";
+          try{
+            if(action==="word-pdf"||action==="word-txt"){
+              if(ext!=="docx")throw new Error("Pilih file .docx. Format .doc lama belum didukung.");
+              await loadScript("https://unpkg.com/mammoth@1.9.0/mammoth.browser.min.js");
+              const ab=await f.arrayBuffer(),res=await mammoth.convertToHtml({arrayBuffer:ab});
+              if(action==="word-txt"){const tmp=document.createElement("div");tmp.innerHTML=res.value;download(new Blob([tmp.innerText],{type:"text/plain;charset=utf-8"}),f.name.replace(/\.docx$/i,"")+".txt");status.textContent="Word berhasil diekspor menjadi TXT.";}
+              else{const safe=res.value;printHtml("<!doctype html><html><head><meta charset='utf-8'><title>Dokumen hasil konversi</title><style>body{font:12pt/1.55 Arial,sans-serif;max-width:800px;margin:35px auto;padding:0 24px}img{max-width:100%}table{border-collapse:collapse;max-width:100%}td,th{border:1px solid #999;padding:5px}@page{margin:20mm}</style></head><body>"+safe+"</body></html>");status.textContent="Dokumen dibuka untuk dicetak. Pilih 'Save as PDF' pada dialog cetak. Tata letak mungkin berbeda dari Word.";}
+            }else if(action==="pdf-txt"){
+              if(ext!=="pdf")throw new Error("Pilih file PDF.");
+              await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+              pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+              const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let pages=[];
+              for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),content=await page.getTextContent();pages.push("HALAMAN "+i+"\n"+content.items.map(x=>x.str).join(" "));}
+              download(new Blob([pages.join("\n\n")],{type:"text/plain;charset=utf-8"}),f.name.replace(/\.pdf$/i,"")+".txt");status.textContent="PDF berhasil diekstrak menjadi teks. PDF hasil scan membutuhkan OCR dan belum didukung.";
+            }else if(action==="excel-csv"){
+              if(!["xlsx","xls"].includes(ext))throw new Error("Pilih file .xlsx atau .xls.");
+              await loadScript("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js");
+              const wb=XLSX.read(await f.arrayBuffer(),{type:"array"}),sheet=wb.Sheets[wb.SheetNames[0]],csv=XLSX.utils.sheet_to_csv(sheet);
+              download(new Blob(["\ufeff",csv],{type:"text/csv;charset=utf-8"}),f.name.replace(/\.(xlsx|xls)$/i,"")+".csv");status.textContent="Sheet pertama berhasil diekspor ke CSV. Sheet lain tidak ikut.";
+            }else if(action==="csv-excel"){
+              if(ext!=="csv")throw new Error("Pilih file .csv.");
+              await loadScript("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js");
+              const wb=XLSX.read(await f.arrayBuffer(),{type:"string"}),ws=wb.Sheets[wb.SheetNames[0]],out=XLSX.utils.book_new();XLSX.utils.book_append_sheet(out,ws,"Data");const bytes=XLSX.write(out,{bookType:"xlsx",type:"array"});
+              download(new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),f.name.replace(/\.csv$/i,"")+".xlsx");status.textContent="CSV berhasil diubah menjadi Excel.";
+            }else if(action==="text-pdf"||action==="text-html"){
+              if(!["txt","md","html","htm"].includes(ext))throw new Error("Pilih file TXT, MD, atau HTML.");
+              if(f.size>5*1024*1024)throw new Error("Ukuran file maksimal 5 MB.");
+              const raw=await f.text();let content;
+              if(ext==="html"||ext==="htm"){const doc=new DOMParser().parseFromString(raw,"text/html");doc.querySelectorAll("script,style,iframe,object,embed").forEach(n=>n.remove());content=doc.body.innerHTML;}
+              else content="<pre>"+raw.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+"</pre>";
+              if(action==="text-html"){download(new Blob(["<!doctype html><meta charset='utf-8'><main>"+content+"</main>"],{type:"text/html;charset=utf-8"}),f.name.replace(/\.(txt|md|html|htm)$/i,"")+".html");status.textContent="HTML berhasil dibuat.";}
+              else{printHtml("<!doctype html><html><head><meta charset='utf-8'><title>Ekspor PDF</title><style>body{font:12pt/1.6 Arial,sans-serif;margin:20mm}pre{white-space:pre-wrap;overflow-wrap:anywhere}@page{margin:20mm}</style></head><body>"+content+"</body></html>");status.textContent="Dialog cetak dibuka. Pilih 'Save as PDF' untuk menyimpan.";}
+            }else if(action.startsWith("image-")){
+              if(!f.type.startsWith("image/"))throw new Error("Pilih file gambar.");
+              const url=URL.createObjectURL(f),im=new Image();await new Promise((ok,no)=>{im.onload=ok;im.onerror=()=>no(new Error("Gambar tidak bisa dibaca."));im.src=url;});
+              if(im.naturalWidth>12000||im.naturalHeight>12000)throw new Error("Gambar terlalu besar untuk diproses di browser.");
+              const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);const mime=action==="image-png"?"image/png":action==="image-jpg"?"image/jpeg":"image/webp";
+              const blob=await new Promise(ok=>c.toBlob(ok,mime,.88));URL.revokeObjectURL(url);if(!blob)throw new Error("Format hasil tidak didukung browser.");
+              download(blob,f.name.replace(/\.[^.]+$/,"")+(mime==="image/png"?".png":mime==="image/jpeg"?".jpg":".webp"));status.textContent="Gambar berhasil dikonversi. Ukuran hasil "+(blob.size/1024).toFixed(1)+" KB.";
+            }
+          }catch(e){status.textContent=e.message||"Konversi gagal. Periksa format file dan koneksi.";}
+        });
+      }
+      if (id === "pdf-tools" || id === "file-compress") {
+        body.innerHTML=`<p>Pilih alat gambar untuk mengubah ukuran atau mengekspor teks sederhana.</p><div class="field"><label>Pilih file gambar atau teks</label><input id="localFile" type="file" accept="image/*,.txt,.md,.csv"></div><div class="field"><label>Tindakan</label><select id="localAction"><option value="text">Ekspor TXT</option><option value="image">Kompres gambar WebP</option></select></div><button class="primary-button" id="localRun">Proses &amp; unduh</button><div class="result" id="localOut"></div>`;
         $("#localRun").addEventListener("click",async()=>{const f=$("#localFile").files[0],a=$("#localAction").value;if(!f){$("#localOut").textContent="Pilih file.";return;}try{let b,n;if(a==="image"){if(!f.type.startsWith("image/"))throw Error("Pilih file gambar.");const u=URL.createObjectURL(f),im=new Image();await new Promise((ok,no)=>{im.onload=ok;im.onerror=no;im.src=u;});const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);b=await new Promise(ok=>c.toBlob(ok,"image/webp",.75));URL.revokeObjectURL(u);n="gambar-webp.webp";}else{if(f.size>5e6)throw Error("File maksimal 5 MB.");b=new Blob([await f.text()],{type:"text/plain;charset=utf-8"});n="dokumen.txt";}if(!b)throw Error("Tidak dapat memproses file.");const u=URL.createObjectURL(b),link=document.createElement("a");link.href=u;link.download=n;link.click();setTimeout(()=>URL.revokeObjectURL(u),1000);$("#localOut").textContent="Selesai. Ukuran hasil "+(b.size/1024).toFixed(1)+" KB."; }catch(e){$("#localOut").textContent=e.message||"Gagal memproses file.";}});
       }
       modal.classList.add("open");
