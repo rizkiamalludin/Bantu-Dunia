@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="BantuDunia menyediakan alat digital gratis untuk belajar, bekerja, dan membantu kehidupan sehari-hari.">
+  <meta name="description" content="BantuDunia adalah platform bantuan digital untuk belajar, bekerja, mengelola kehidupan, mengembangkan usaha, dan membantu sesama.">
   <meta name="theme-color" content="#0f766e">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <title>BantuDunia — Alat Gratis untuk Semua</title>
+  <title>BantuDunia — Platform Bantuan Digital untuk Semua</title>
 
   <style>
     :root {
@@ -523,7 +523,7 @@ html.site-dark body a{color:#93c5fd}
         </form>
       </div>
     </section>
-    <section class="section container" id="ai"><div class="ai-preview"><div class="ai-mark">✦</div><div class="ai-copy"><span class="tag">ASISTEN DIGITAL BANTU DUNIA</span><h2>Butuh bantuan? Ceritakan saja kebutuhanmu.</h2><p>AI Bantu Dunia sedang disiapkan. Nantinya, AI akan membantu menemukan layanan yang tepat dan memandu pengguna menggunakan alat-alat di platform ini.</p><span class="ai-status"><span></span> AI belum diaktifkan — menunggu integrasi</span></div></div></section>
+    <section class="section container" id="ai"><div class="ai-preview"><div class="ai-mark">✦</div><div class="ai-copy"><span class="tag">ASISTEN DIGITAL BANTU DUNIA</span><h2>Butuh bantuan? Ceritakan saja kebutuhanmu.</h2><p>AI Bantu Dunia direncanakan sebagai pendamping untuk membantu menemukan layanan, memahami informasi, dan menggunakan alat yang tersedia. Fitur ini belum aktif.</p><span class="ai-status"><span></span> AI belum diaktifkan — menunggu integrasi</span></div></div></section>
     <section class="section container" id="tools">
       <div class="section-heading">
         <div>
@@ -542,7 +542,7 @@ html.site-dark body a{color:#93c5fd}
         <button class="category" data-category="finance">💰 Keuangan</button>
         <button class="category" data-category="business">🌾 Pertanian &amp; Usaha</button>
         <button class="category" data-category="community">🤝 Masyarakat</button>
-        <button class="category" data-category="creative">🎨 Kreativitas &amp; Media</button>
+        <button class="category" data-category="creative">🎨 Gambar &amp; Desain</button>
       </div>
 
       <div class="tools-grid" id="toolsGrid"></div>
@@ -803,16 +803,12 @@ html.site-dark body a{color:#93c5fd}
       {id:"document-convert",icon:"🗂️",category:"files",title:"Konversi dokumen",desc:"Konversi format dokumen yang kompatibel seperti DOCX, PDF, XLSX, dan PPTX.",status:"planned"},
       {id:"file-compress",icon:"🗜️",category:"files",title:"Kompres file",desc:"Perkecil ukuran file dengan menjaga format aslinya jika memungkinkan.",status:"planned"},
       {id:"image-tools",icon:"🖼️",category:"creative",title:"Pengolah gambar",desc:"Kompres, ubah ukuran, dan konversi JPG, PNG, serta WebP.",status:"planned"},
-      {id:"audio-tools",icon:"🎧",category:"creative",title:"Pengolah audio",desc:"Alat untuk memotong dan mengonversi format audio yang didukung.",status:"planned"},
-      {id:"video-tools",icon:"🎬",category:"creative",title:"Pengolah video",desc:"Alat untuk mengelola ukuran, durasi, dan format video yang kompatibel.",status:"planned"},
-      {id:"archive-tools",icon:"🗃️",category:"files",title:"Arsip & ZIP",desc:"Buat dan buka arsip ZIP untuk mengelola banyak file sekaligus.",status:"planned"},
       {id:"budget-tools",icon:"💳",category:"finance",title:"Anggaran pribadi",desc:"Catat pemasukan, pengeluaran, dan rencana anggaran sederhana.",status:"planned"},
       {id:"business-tools",icon:"📈",category:"finance",title:"Kalkulator usaha",desc:"Hitung modal, biaya, harga jual, omzet, dan perkiraan laba.",status:"planned"},
       {id:"farm-planner",icon:"🌱",category:"business",title:"Asisten pertanian",desc:"Rencana tanam, catatan panen, kebutuhan produksi, dan perhitungan usaha tani.",status:"planned"},
       {id:"small-business",icon:"🏪",category:"business",title:"Manajemen usaha kecil",desc:"Kelola stok, daftar produk, pesanan, dan catatan penjualan.",status:"planned"},
       {id:"public-services",icon:"🏛️",category:"community",title:"Panduan layanan publik",desc:"Panduan administrasi dan informasi layanan masyarakat dari sumber tepercaya.",status:"planned"},
       {id:"accessibility",icon:"♿",category:"community",title:"Aksesibilitas digital",desc:"Alat bantu agar layanan digital lebih mudah digunakan banyak orang.",status:"planned"},
-      {id:"creative-studio",icon:"✨",category:"creative",title:"Studio kreatif",desc:"Ruang alat bantu untuk ide, desain, konten, dan karya digital.",status:"planned"}
     ];
 
     const $ = selector => document.querySelector(selector);
@@ -858,8 +854,8 @@ html.site-dark body a{color:#93c5fd}
     function renderTools() {
       const filtered = tools.filter(tool => {
         const matchesCategory = currentCategory === "all" || tool.category === currentCategory;
-        const searchable = (tr(tool.titleKey) + " " + tr(tool.descKey) + " " + tool.id).toLowerCase();
-        return matchesCategory && searchable.includes(currentQuery.toLowerCase());
+        const searchable = (tool.title || tr(tool.titleKey) || "") + " " + (tool.desc || tr(tool.descKey) || "") + " " + tool.id;
+        return matchesCategory && searchable.toLowerCase().includes(currentQuery.toLowerCase());
       });
 
       $("#toolsGrid").innerHTML = filtered.map(tool => `
@@ -914,8 +910,8 @@ html.site-dark body a{color:#93c5fd}
       const tool = tools.find(item => item.id === id);
       if (!tool) return;
 
-      $("#modalTitle").textContent = tr(tool.titleKey);
-      $("#modalDescription").textContent = tr(tool.descKey);
+      $("#modalTitle").textContent = tool.title || tr(tool.titleKey);
+      $("#modalDescription").textContent = tool.desc || tr(tool.descKey);
       const body = $("#toolBody");
       body.innerHTML = "";
 
