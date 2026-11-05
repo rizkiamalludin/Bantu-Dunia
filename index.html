@@ -493,6 +493,21 @@ body.dark .tool-status{background:#4b391b;color:#f7d58c}
     @media(max-width:600px){.modal{padding:9px}.modal-content{max-height:94vh;border-radius:19px}.tool-modal-banner{gap:12px;padding:19px 17px}.tool-modal-symbol{width:52px;height:52px;border-radius:16px;font-size:26px}.tool-modal-eyebrow{font-size:9px;letter-spacing:.8px}.tool-modal-heading p{font-size:12px}.tool-modal-banner .close-button{width:35px;height:35px} .tool-modal-divider{padding:14px 18px 0}#toolBody{padding:8px 18px 18px}.tool-modal-footnote{padding:12px 18px 15px}}
     @media(prefers-reduced-motion:reduce){.tool-modal-banner .close-button,#toolBody .primary-button{transition:none}}
 
+
+    /* Tombol unggah file yang konsisten di semua alat */
+    #toolBody .file-picker{margin:17px 0}
+    #toolBody .file-picker-input{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+    #toolBody .file-picker-label{display:flex;align-items:center;gap:14px;width:100%;min-height:86px;padding:15px 17px;border:1.5px dashed color-mix(in srgb,var(--primary) 48%,var(--border));border-radius:15px;background:linear-gradient(110deg,color-mix(in srgb,var(--primary) 7%,var(--card)),var(--card));cursor:pointer;transition:border-color .18s,background .18s,transform .18s}
+    #toolBody .file-picker-label:hover,#toolBody .file-picker-input:focus-visible+.file-picker-label{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,var(--card));transform:translateY(-1px)}
+    #toolBody .file-picker-icon{display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:14px;background:color-mix(in srgb,var(--primary) 13%,var(--card));color:var(--primary);font-size:23px}
+    #toolBody .file-picker-copy{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+    #toolBody .file-picker-title{color:var(--text);font-size:14px;font-weight:800}
+    #toolBody .file-picker-hint{color:var(--muted);font-size:11px;line-height:1.4;overflow-wrap:anywhere}
+    #toolBody .file-picker-action{flex:none;padding:9px 13px;border-radius:10px;background:var(--primary);color:white;font-size:12px;font-weight:750;box-shadow:0 4px 12px rgba(15,118,110,.16)}
+    #toolBody .file-picker.has-file .file-picker-icon{background:rgba(34,197,94,.13);color:#16a34a}
+    #toolBody .file-picker.has-file .file-picker-action{background:#15803d}
+    @media(max-width:480px){#toolBody .file-picker-label{gap:10px;padding:12px}#toolBody .file-picker-icon{width:42px;height:42px}#toolBody .file-picker-action{padding:8px 10px;font-size:11px}}
+
   </style>
 
   <style id="site-quality-baseline">
@@ -1404,6 +1419,43 @@ html.site-dark body a{color:#93c5fd}
         body.innerHTML=`<p>Pilih alat gambar untuk mengubah ukuran atau mengekspor teks sederhana.</p><div class="field"><label>Pilih file gambar atau teks</label><input id="localFile" type="file" accept="image/*,.txt,.md,.csv"></div><div class="field"><label>Tindakan</label><select id="localAction"><option value="text">Ekspor TXT</option><option value="image">Kompres gambar WebP</option></select></div><button class="primary-button" id="localRun">Proses &amp; unduh</button><div class="result" id="localOut"></div>`;
         $("#localRun").addEventListener("click",async()=>{const f=$("#localFile").files[0],a=$("#localAction").value;if(!f){$("#localOut").textContent="Pilih file.";return;}try{let b,n;if(a==="image"){if(!f.type.startsWith("image/"))throw Error("Pilih file gambar.");const u=URL.createObjectURL(f),im=new Image();await new Promise((ok,no)=>{im.onload=ok;im.onerror=no;im.src=u;});const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);b=await new Promise(ok=>c.toBlob(ok,"image/webp",.75));URL.revokeObjectURL(u);n="gambar-webp.webp";}else{if(f.size>5e6)throw Error("File maksimal 5 MB.");b=new Blob([await f.text()],{type:"text/plain;charset=utf-8"});n="dokumen.txt";}if(!b)throw Error("Tidak dapat memproses file.");const u=URL.createObjectURL(b),link=document.createElement("a");link.href=u;link.download=n;link.click();setTimeout(()=>URL.revokeObjectURL(u),1000);$("#localOut").textContent="Selesai. Ukuran hasil "+(b.size/1024).toFixed(1)+" KB."; }catch(e){$("#localOut").textContent=e.message||"Gagal memproses file.";}});
       }
+      body.querySelectorAll('input[type="file"]').forEach(input => {
+        if (input.dataset.styled === "yes") return;
+        input.dataset.styled = "yes";
+        const picker = document.createElement("div");
+        picker.className = "file-picker";
+        const label = document.createElement("label");
+        label.className = "file-picker-label";
+        label.htmlFor = input.id;
+        const icon = document.createElement("span");
+        icon.className = "file-picker-icon";
+        icon.setAttribute("aria-hidden","true");
+        icon.textContent = "↑";
+        const copy = document.createElement("span");
+        copy.className = "file-picker-copy";
+        const title = document.createElement("span");
+        title.className = "file-picker-title";
+        title.textContent = "Pilih file dari perangkat";
+        const hint = document.createElement("span");
+        hint.className = "file-picker-hint";
+        hint.textContent = input.accept ? "Format didukung: " + input.accept.replaceAll(".", "").replaceAll(",", ", ") : "Pilih file yang ingin diproses";
+        const action = document.createElement("span");
+        action.className = "file-picker-action";
+        action.textContent = "Jelajahi file";
+        copy.append(title,hint);
+        label.append(icon,copy,action);
+        input.classList.add("file-picker-input");
+        input.parentNode.insertBefore(picker,input);
+        picker.append(input,label);
+        input.addEventListener("change",() => {
+          const file = input.files && input.files[0];
+          picker.classList.toggle("has-file",!!file);
+          title.textContent = file ? file.name : "Pilih file dari perangkat";
+          hint.textContent = file ? (file.size/1024/1024).toFixed(2) + " MB · File siap diproses" : (input.accept ? "Format didukung: " + input.accept.replaceAll(".", "").replaceAll(",", ", ") : "Pilih file yang ingin diproses");
+          icon.textContent = file ? "✓" : "↑";
+          action.textContent = file ? "Ganti file" : "Jelajahi file";
+        });
+      });
       modal.classList.add("open");
       $("#closeModal").focus();
     }
