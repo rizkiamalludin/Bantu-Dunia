@@ -1389,6 +1389,53 @@ html.site-dark body a{color:#93c5fd}
           preview.hidden=false;downloadButton.hidden=false;
         };
         const download=async(blob,name)=>{readyBlob=blob;readyName=name;await showPreview(blob,name);status.textContent="Hasil konversi berhasil. Periksa pratinjau, lalu klik Unduh hasil konversi jika sudah sesuai.";};
+        const makeDocxPdf=async(file)=>{
+          await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+          await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+          const zip=await JSZip.loadAsync(await file.arrayBuffer());
+          const xmlFile=zip.file("word/document.xml");
+          if(!xmlFile)throw new Error("Struktur dokumen Word tidak ditemukan.");
+          const xml=await xmlFile.async("text");
+          const xmlDoc=new DOMParser().parseFromString(xml,"application/xml");
+          if(xmlDoc.querySelector("parsererror"))throw new Error("Isi dokumen Word tidak dapat dibaca.");
+          const ns="http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+          const paragraphs=[...xmlDoc.getElementsByTagNameNS(ns,"p")].map(p=>{
+            let value="";
+            const walk=node=>{
+              for(const child of node.childNodes){
+                if(child.nodeType!==1)continue;
+                if(child.namespaceURI===ns&&child.localName==="t")value+=child.textContent||"";
+                else if(child.namespaceURI===ns&&child.localName==="tab")value+="    ";
+                else if(child.namespaceURI===ns&&(child.localName==="br"||child.localName==="cr"))value+="\n";
+                else walk(child);
+              }
+            };
+            walk(p);
+            return value.replace(/[\\t ]+$/g,"");
+          });
+          if(!paragraphs.some(x=>x.trim()))throw new Error("Tidak ada teks yang bisa dikonversi dari dokumen ini.");
+          const {jsPDF}=window.jspdf;
+          const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+          const margin=18,pageWidth=210,pageHeight=297,lineHeight=6;
+          const maxWidth=pageWidth-margin*2;
+          let y=margin;
+          pdf.setFont("helvetica","normal");
+          pdf.setFontSize(11);
+          for(const paragraph of paragraphs){
+            if(!paragraph.trim()){y+=3;continue;}
+            const safe=paragraph.replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,"-").replace(/…/g,"...");
+            const lines=pdf.splitTextToSize(safe,maxWidth);
+            for(const line of lines){
+              if(y>pageHeight-margin){pdf.addPage();y=margin;}
+              pdf.text(line,margin,y);
+              y+=lineHeight;
+            }
+            y+=2;
+          }
+          const blob=pdf.output("blob");
+          if(!blob||blob.size<500)throw new Error("PDF gagal dibuat. Silakan coba lagi.");
+          return blob;
+        };
         const makePdf=async(html)=>{
           await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js");
           const parsed=new DOMParser().parseFromString(html,"text/html");
@@ -1416,11 +1463,17 @@ html.site-dark body a{color:#93c5fd}
           try{
             if(action==="word-pdf"||action==="word-txt"){
               if(ext!=="docx")throw new Error("Pilih file .docx. Format .doc lama belum didukung.");
-              await loadScript("https://unpkg.com/mammoth@1.9.0/mammoth.browser.min.js");
-              const ab=await f.arrayBuffer(),res=await mammoth.convertToHtml({arrayBuffer:ab});
-              if(!res.value||!res.value.replace(/<[^>]*>/g,"").trim())throw new Error("Teks tidak ditemukan di dokumen Word. Pastikan file .docx berisi teks, bukan hanya hasil scan/gambar.");
-              if(action==="word-txt"){const tmp=document.createElement("div");tmp.innerHTML=res.value;download(new Blob([tmp.innerText],{type:"text/plain;charset=utf-8"}),f.name.replace(/\.docx$/i,"")+".txt");status.textContent="Word berhasil dikonversi menjadi TXT. Klik tombol Unduh hasil konversi.";}
-              else{const safe=res.value;const html="<!doctype html><html><head><meta charset='utf-8'><title>Dokumen hasil konversi</title><style>body{font:12pt/1.55 Arial,sans-serif;max-width:800px;margin:35px auto;padding:0 24px}img{max-width:100%}table{border-collapse:collapse;max-width:100%}td,th{border:1px solid #999;padding:5px}</style></head><body>"+safe+"</body></html>";const pdfBlob=await makePdf(html);await download(pdfBlob,f.name.replace(/\.docx$/i,"")+".pdf");}
+              if(action==="word-txt"){
+                await loadScript("https://unpkg.com/mammoth@1.9.0/mammoth.browser.min.js");
+                const ab=await f.arrayBuffer(),res=await mammoth.convertToHtml({arrayBuffer:ab});
+                if(!res.value||!res.value.replace(/<[^>]*>/g,"").trim())throw new Error("Teks tidak ditemukan di dokumen Word. Pastikan file .docx berisi teks, bukan hanya hasil scan/gambar.");
+                const tmp=document.createElement("div");tmp.innerHTML=res.value;
+                download(new Blob([tmp.innerText],{type:"text/plain;charset=utf-8"}),f.name.replace(/\.docx$/i,"")+".txt");
+                status.textContent="Word berhasil dikonversi menjadi TXT. Klik tombol Unduh hasil konversi.";
+              }else{
+                const pdfBlob=await makeDocxPdf(f);
+                await download(pdfBlob,f.name.replace(/\.docx$/i,"")+".pdf");
+              }
             }else if(action==="pdf-txt"){
               if(ext!=="pdf")throw new Error("Pilih file PDF.");
               await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
