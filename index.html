@@ -1391,11 +1391,22 @@ html.site-dark body a{color:#93c5fd}
         const download=async(blob,name)=>{readyBlob=blob;readyName=name;await showPreview(blob,name);status.textContent="Hasil konversi berhasil. Periksa pratinjau, lalu klik Unduh hasil konversi jika sudah sesuai.";};
         const makePdf=async(html)=>{
           await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js");
-          const holder=document.createElement("div");holder.innerHTML=html;
-          holder.style.cssText="position:fixed;left:-10000px;top:0;width:780px;padding:24px;background:white;color:#111;font:12pt/1.55 Arial,sans-serif";
+          const parsed=new DOMParser().parseFromString(html,"text/html");
+          const holder=document.createElement("div");
+          holder.innerHTML=parsed.body.innerHTML;
+          const styles=[...parsed.head.querySelectorAll("style")].map(node=>node.textContent).join("\n");
+          holder.style.cssText="display:block;position:absolute;left:0;top:0;z-index:-1;width:760px;box-sizing:border-box;padding:24px;background:#fff;color:#111;font:12pt/1.55 Arial,sans-serif;overflow:visible";
+          const style=document.createElement("style");
+          style.textContent=styles+"\n#bd-pdf-render p{margin:0 0 10px}#bd-pdf-render img{max-width:100%;height:auto}#bd-pdf-render table{border-collapse:collapse;max-width:100%}#bd-pdf-render td,#bd-pdf-render th{border:1px solid #999;padding:5px}";
+          holder.id="bd-pdf-render";
+          document.head.appendChild(style);
           document.body.appendChild(holder);
-          try{return await html2pdf().set({margin:10,filename:"hasil-konversi.pdf",image:{type:"jpeg",quality:.96},html2canvas:{scale:1.5,useCORS:true},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}}).from(holder).outputPdf("blob");}
-          finally{holder.remove();}
+          try{
+            await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+            const blob=await html2pdf().set({margin:10,image:{type:"jpeg",quality:.98},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff",windowWidth:820,scrollX:0,scrollY:0},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"]}}).from(holder).outputPdf("blob");
+            if(!blob||blob.size<500)throw new Error("PDF yang dihasilkan kosong. Coba simpan dokumen Word sebagai .docx lalu ulangi.");
+            return blob;
+          }finally{holder.remove();style.remove();}
         };
         $("#convertStart").addEventListener("click",async()=>{
           const f=$("#convertFile").files[0],action=$("#convertAction").value;
@@ -1407,6 +1418,7 @@ html.site-dark body a{color:#93c5fd}
               if(ext!=="docx")throw new Error("Pilih file .docx. Format .doc lama belum didukung.");
               await loadScript("https://unpkg.com/mammoth@1.9.0/mammoth.browser.min.js");
               const ab=await f.arrayBuffer(),res=await mammoth.convertToHtml({arrayBuffer:ab});
+              if(!res.value||!res.value.replace(/<[^>]*>/g,"").trim())throw new Error("Teks tidak ditemukan di dokumen Word. Pastikan file .docx berisi teks, bukan hanya hasil scan/gambar.");
               if(action==="word-txt"){const tmp=document.createElement("div");tmp.innerHTML=res.value;download(new Blob([tmp.innerText],{type:"text/plain;charset=utf-8"}),f.name.replace(/\.docx$/i,"")+".txt");status.textContent="Word berhasil dikonversi menjadi TXT. Klik tombol Unduh hasil konversi.";}
               else{const safe=res.value;const html="<!doctype html><html><head><meta charset='utf-8'><title>Dokumen hasil konversi</title><style>body{font:12pt/1.55 Arial,sans-serif;max-width:800px;margin:35px auto;padding:0 24px}img{max-width:100%}table{border-collapse:collapse;max-width:100%}td,th{border:1px solid #999;padding:5px}</style></head><body>"+safe+"</body></html>";const pdfBlob=await makePdf(html);await download(pdfBlob,f.name.replace(/\.docx$/i,"")+".pdf");}
             }else if(action==="pdf-txt"){
