@@ -1350,31 +1350,65 @@ html.site-dark body a{color:#93c5fd}
             <option value="image-png">Gambar → PNG</option>
           </select></div>
           <div class="result" id="convertNotice">Pilih file dan jenis konversi.</div>
-          <button class="primary-button" id="convertStart">Konversi file</button><button class="primary-button" id="convertDownload" hidden style="margin-top:12px">⬇ Unduh hasil konversi</button>
+          <button class="primary-button" id="convertStart">Konversi file</button>
+          <section id="convertPreview" hidden style="margin-top:18px;padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--bg)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px"><strong>Pratinjau hasil konversi</strong><span id="convertPreviewName" style="font-size:12px;color:var(--muted)"></span></div>
+            <div id="convertPreviewContent" style="min-height:120px;max-height:520px;overflow:auto;border-radius:10px;background:var(--card);color:var(--text);padding:10px"></div>
+            <button class="primary-button" id="convertDownload" hidden style="margin-top:12px">⬇ Unduh hasil konversi</button>
+          </section>
           <p class="status-line">Catatan: Word ke PDF dibuat dari isi teks dan dapat mengubah tata letak. Untuk dokumen penting, periksa kembali hasilnya. File tidak diunggah oleh alat ini.</p>`;
         const status=$("#convertNotice");
-        let readyBlob=null,readyName="";
+        let readyBlob=null,readyName="",previewUrl="";
         const downloadButton=$("#convertDownload");
+        const preview=$("#convertPreview"),previewContent=$("#convertPreviewContent");
         downloadButton.addEventListener("click",()=>{if(!readyBlob)return;const url=URL.createObjectURL(readyBlob),link=document.createElement("a");link.href=url;link.download=readyName;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);});
         const loadScript=src=>new Promise((resolve,reject)=>{
           const existing=[...document.scripts].find(s=>s.src===src);
           if(existing){if(existing.dataset.loaded==="yes"){resolve();return;}existing.addEventListener("load",resolve,{once:true});existing.addEventListener("error",reject,{once:true});return;}
           const s=document.createElement("script");s.src=src;s.async=true;s.onload=()=>{s.dataset.loaded="yes";resolve();};s.onerror=()=>reject(new Error("Pustaka konversi gagal dimuat. Periksa koneksi internet."));document.head.appendChild(s);
         });
-        const download=(blob,name)=>{readyBlob=blob;readyName=name;downloadButton.hidden=false;status.textContent="Hasil siap diunduh: "+name;};
-        const printHtml=html=>{const w=window.open("","_blank");if(!w)throw new Error("Popup diblokir. Izinkan popup untuk mencetak PDF.");w.document.open();w.document.write(html);w.document.close();w.onload=()=>{w.focus();w.print();};};
+        const showPreview=async(blob,name)=>{
+          if(previewUrl)URL.revokeObjectURL(previewUrl);
+          previewUrl=URL.createObjectURL(blob);
+          $("#convertPreviewName").textContent=name;
+          previewContent.innerHTML="";
+          if(blob.type.startsWith("image/")){
+            const img=document.createElement("img");img.src=previewUrl;img.alt="Hasil konversi";img.style.cssText="display:block;max-width:100%;max-height:480px;margin:auto;object-fit:contain";previewContent.appendChild(img);
+          }else if(blob.type==="application/pdf"){
+            const frame=document.createElement("iframe");frame.src=previewUrl;frame.title="Pratinjau PDF";frame.style.cssText="width:100%;height:500px;border:0;background:white;border-radius:8px";previewContent.appendChild(frame);
+          }else if(blob.type==="text/html"){
+            const frame=document.createElement("iframe");frame.src=previewUrl;frame.title="Pratinjau HTML";frame.style.cssText="width:100%;height:420px;border:0;background:white;border-radius:8px";previewContent.appendChild(frame);
+          }else if(blob.type.includes("spreadsheet")){
+            await loadScript("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js");
+            const wb=XLSX.read(await blob.arrayBuffer(),{type:"array"}),html=XLSX.utils.sheet_to_html(wb.Sheets[wb.SheetNames[0]]);
+            const frame=document.createElement("iframe");frame.title="Pratinjau Excel";frame.style.cssText="width:100%;height:420px;border:0;background:white;border-radius:8px";previewContent.appendChild(frame);
+            frame.srcdoc="<meta charset='utf-8'><style>body{font:13px Arial;padding:10px;color:#172b35}table{border-collapse:collapse}td,th{border:1px solid #ccd5dc;padding:6px}</style>"+html;
+          }else{
+            const pre=document.createElement("pre");pre.textContent=await blob.text();pre.style.cssText="white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.6 ui-monospace,monospace;margin:0";previewContent.appendChild(pre);
+          }
+          preview.hidden=false;downloadButton.hidden=false;
+        };
+        const download=async(blob,name)=>{readyBlob=blob;readyName=name;await showPreview(blob,name);status.textContent="Hasil konversi berhasil. Periksa pratinjau, lalu klik Unduh hasil konversi jika sudah sesuai.";};
+        const makePdf=async(html)=>{
+          await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js");
+          const holder=document.createElement("div");holder.innerHTML=html;
+          holder.style.cssText="position:fixed;left:-10000px;top:0;width:780px;padding:24px;background:white;color:#111;font:12pt/1.55 Arial,sans-serif";
+          document.body.appendChild(holder);
+          try{return await html2pdf().set({margin:10,filename:"hasil-konversi.pdf",image:{type:"jpeg",quality:.96},html2canvas:{scale:1.5,useCORS:true},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}}).from(holder).outputPdf("blob");}
+          finally{holder.remove();}
+        };
         $("#convertStart").addEventListener("click",async()=>{
           const f=$("#convertFile").files[0],action=$("#convertAction").value;
           if(!f){status.textContent="Pilih file terlebih dahulu.";return;}
           const ext=(f.name.split(".").pop()||"").toLowerCase();
-          readyBlob=null;readyName="";downloadButton.hidden=true;status.textContent="Sedang memproses…";
+          readyBlob=null;readyName="";downloadButton.hidden=true;preview.hidden=true;previewContent.innerHTML="";if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl="";}status.textContent="Sedang memproses…";
           try{
             if(action==="word-pdf"||action==="word-txt"){
               if(ext!=="docx")throw new Error("Pilih file .docx. Format .doc lama belum didukung.");
               await loadScript("https://unpkg.com/mammoth@1.9.0/mammoth.browser.min.js");
               const ab=await f.arrayBuffer(),res=await mammoth.convertToHtml({arrayBuffer:ab});
               if(action==="word-txt"){const tmp=document.createElement("div");tmp.innerHTML=res.value;download(new Blob([tmp.innerText],{type:"text/plain;charset=utf-8"}),f.name.replace(/\.docx$/i,"")+".txt");status.textContent="Word berhasil dikonversi menjadi TXT. Klik tombol Unduh hasil konversi.";}
-              else{const safe=res.value;printHtml("<!doctype html><html><head><meta charset='utf-8'><title>Dokumen hasil konversi</title><style>body{font:12pt/1.55 Arial,sans-serif;max-width:800px;margin:35px auto;padding:0 24px}img{max-width:100%}table{border-collapse:collapse;max-width:100%}td,th{border:1px solid #999;padding:5px}@page{margin:20mm}</style></head><body>"+safe+"</body></html>");status.textContent="Dokumen dibuka untuk dicetak. Pilih 'Save as PDF' pada dialog cetak. Tata letak mungkin berbeda dari Word.";}
+              else{const safe=res.value;const html="<!doctype html><html><head><meta charset='utf-8'><title>Dokumen hasil konversi</title><style>body{font:12pt/1.55 Arial,sans-serif;max-width:800px;margin:35px auto;padding:0 24px}img{max-width:100%}table{border-collapse:collapse;max-width:100%}td,th{border:1px solid #999;padding:5px}</style></head><body>"+safe+"</body></html>";const pdfBlob=await makePdf(html);await download(pdfBlob,f.name.replace(/\.docx$/i,"")+".pdf");}
             }else if(action==="pdf-txt"){
               if(ext!=="pdf")throw new Error("Pilih file PDF.");
               await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
@@ -1399,7 +1433,7 @@ html.site-dark body a{color:#93c5fd}
               if(ext==="html"||ext==="htm"){const doc=new DOMParser().parseFromString(raw,"text/html");doc.querySelectorAll("script,style,iframe,object,embed").forEach(n=>n.remove());content=doc.body.innerHTML;}
               else content="<pre>"+raw.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+"</pre>";
               if(action==="text-html"){download(new Blob(["<!doctype html><meta charset='utf-8'><main>"+content+"</main>"],{type:"text/html;charset=utf-8"}),f.name.replace(/\.(txt|md|html|htm)$/i,"")+".html");status.textContent="HTML berhasil dibuat. Klik tombol Unduh hasil konversi.";}
-              else{printHtml("<!doctype html><html><head><meta charset='utf-8'><title>Ekspor PDF</title><style>body{font:12pt/1.6 Arial,sans-serif;margin:20mm}pre{white-space:pre-wrap;overflow-wrap:anywhere}@page{margin:20mm}</style></head><body>"+content+"</body></html>");status.textContent="Dialog cetak dibuka. Pilih 'Save as PDF' untuk menyimpan.";}
+              else{const html="<!doctype html><html><head><meta charset='utf-8'><title>Ekspor PDF</title><style>body{font:12pt/1.6 Arial,sans-serif;margin:20mm}pre{white-space:pre-wrap;overflow-wrap:anywhere}</style></head><body>"+content+"</body></html>";const pdfBlob=await makePdf(html);await download(pdfBlob,f.name.replace(/\.(txt|md|html|htm)$/i,"")+".pdf");}
             }else if(action.startsWith("image-")){
               if(!f.type.startsWith("image/"))throw new Error("Pilih file gambar.");
               const url=URL.createObjectURL(f),im=new Image();await new Promise((ok,no)=>{im.onload=ok;im.onerror=()=>no(new Error("Gambar tidak bisa dibaca."));im.src=url;});
