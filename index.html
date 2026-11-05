@@ -413,6 +413,13 @@
       border-radius: 8px;
     }
 
+.ai-preview{display:flex;align-items:center;gap:26px;padding:30px;border:1px solid var(--border);border-radius:22px;background:linear-gradient(120deg,var(--soft),var(--card))}
+.ai-mark{width:76px;height:76px;flex:none;display:grid;place-items:center;border-radius:22px;background:var(--primary);color:#fff;font-size:42px}
+.ai-copy h2{font-size:clamp(23px,3vw,32px);margin:5px 0 8px}.ai-copy p{max-width:720px;color:var(--muted);margin-bottom:14px}
+.ai-status{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--muted)}.ai-status span{width:8px;height:8px;border-radius:50%;background:#d69b31}
+.tool-status{display:inline-block;margin:-4px 0 12px;padding:4px 9px;border-radius:99px;background:#fff3d6;color:#8a5a08;font-size:11px;font-weight:700}
+body.dark .tool-status{background:#4b391b;color:#f7d58c}
+@media(max-width:600px){.ai-preview{align-items:flex-start;flex-direction:column;padding:22px}.ai-mark{width:58px;height:58px;font-size:32px}}
     @keyframes appear {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -516,7 +523,7 @@ html.site-dark body a{color:#93c5fd}
         </form>
       </div>
     </section>
-
+    <section class="section container" id="ai"><div class="ai-preview"><div class="ai-mark">✦</div><div class="ai-copy"><span class="tag">ASISTEN DIGITAL BANTU DUNIA</span><h2>Butuh bantuan? Ceritakan saja kebutuhanmu.</h2><p>AI Bantu Dunia sedang disiapkan. Nantinya, AI akan membantu menemukan layanan yang tepat dan memandu pengguna menggunakan alat-alat di platform ini.</p><span class="ai-status"><span></span> AI belum diaktifkan — menunggu integrasi</span></div></div></section>
     <section class="section container" id="tools">
       <div class="section-heading">
         <div>
@@ -531,6 +538,11 @@ html.site-dark body a{color:#93c5fd}
         <button class="category" data-category="education" data-i18n="education">Pendidikan</button>
         <button class="category" data-category="writing" data-i18n="writing">Karya</button>
         <button class="category" data-category="daily" data-i18n="daily">Kebutuhan harian</button>
+        <button class="category" data-category="files">📁 Dokumen &amp; File</button>
+        <button class="category" data-category="finance">💰 Keuangan</button>
+        <button class="category" data-category="business">🌾 Pertanian &amp; Usaha</button>
+        <button class="category" data-category="community">🤝 Masyarakat</button>
+        <button class="category" data-category="creative">🎨 Kreativitas &amp; Media</button>
       </div>
 
       <div class="tools-grid" id="toolsGrid"></div>
@@ -561,6 +573,7 @@ html.site-dark body a{color:#93c5fd}
   </main>
 
   <section id="kontak-rizki" aria-label="Kontak pemilik website" style="padding:36px 20px;margin:20px auto;max-width:1120px"><h2 style="margin:0 0 8px">Kontak &amp; Masukan</h2><p style="margin:0 0 18px">Ada saran atau menemukan kesalahan? Hubungi saya melalui kanal resmi berikut.</p><div style="display:flex;gap:14px;flex-wrap:wrap"><a href="mailto:rizkiamalludin99@gmail.com?subject=Masukan%20untuk%20BantuDunia" aria-label="Kirim email ke Rizki melalui Gmail" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid #cbd5e1;border-radius:14px;text-decoration:none;color:inherit;max-width:100%"><svg viewBox="0 0 48 36" width="42" height="32" role="img" aria-label="Logo Gmail" style="flex:none"><path fill="#4285F4" d="M3 9.5V32h8V15z"/><path fill="#34A853" d="M37 15v17h8V9.5z"/><path fill="#EA4335" d="M3 9.5V5.8C3 2.4 7 .6 9.8 2.5L24 13l14.2-10.5C41 .6 45 2.4 45 5.8v3.7L24 25z"/><path fill="#C5221F" d="M3 9.5 11 15v17H3z"/><path fill="#FBBC04" d="M37 15 45 9.5V32h-8z"/></svg><span><strong>Gmail</strong><br><span>rizkiamalludin99@gmail.com</span></span></a><a href="https://www.instagram.com/rizki_amalludin.exe/" target="_blank" rel="noopener noreferrer" aria-label="Buka Instagram Rizki" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid #cbd5e1;border-radius:14px;text-decoration:none;color:inherit;max-width:100%"><svg viewBox="0 0 48 48" width="42" height="42" role="img" aria-label="Logo Instagram" style="flex:none"><defs><linearGradient id="igOfficialGradient" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#FFDC80"/><stop offset=".35" stop-color="#F77737"/><stop offset=".65" stop-color="#E1306C"/><stop offset="1" stop-color="#833AB4"/></linearGradient></defs><rect x="3" y="3" width="42" height="42" rx="12" fill="url(#igOfficialGradient)"/><rect x="12" y="12" width="24" height="24" rx="7" fill="none" stroke="#fff" stroke-width="3.2"/><circle cx="24" cy="24" r="5.5" fill="none" stroke="#fff" stroke-width="3.2"/><circle cx="32" cy="16.5" r="2" fill="#fff"/></svg><span><strong>Instagram</strong><br><span>@rizki_amalludin.exe</span></span></a></div></section>
+<section class="section container" id="principles"><div class="about"><h2>Prinsip Bantu Dunia</h2><p>Utamakan manfaat nyata, mudah digunakan, ramah perangkat, transparan soal batasan, dan menjaga privasi. File pengguna sebisa mungkin diproses langsung di perangkat tanpa perlu diunggah ke server.</p></div></section>
 <footer>
     <div class="container footer-content">
       <span>© <span id="year"></span> BantuDunia</span>
@@ -785,7 +798,21 @@ html.site-dark body a{color:#93c5fd}
       {id:"farming", icon:"🌱", category:"daily", titleKey:"farmingTitle", descKey:"farmingDesc"},
       {id:"aid", icon:"🤝", category:"daily", titleKey:"aidTitle", descKey:"aidDesc"},
       {id:"safety", icon:"🛡️", category:"daily", titleKey:"safetyTitle", descKey:"safetyDesc"},
-      {id:"opportunities", icon:"🚀", category:"education", titleKey:"opportunitiesTitle", descKey:"opportunitiesDesc"}
+      {id:"opportunities", icon:"🚀", category:"education", titleKey:"opportunitiesTitle", descKey:"opportunitiesDesc"},
+      {id:"pdf-tools",icon:"📄",category:"files",title:"Alat PDF",desc:"Gabungkan, pisahkan, susun, dan optimalkan dokumen PDF.",status:"planned"},
+      {id:"document-convert",icon:"🗂️",category:"files",title:"Konversi dokumen",desc:"Konversi format dokumen yang kompatibel seperti DOCX, PDF, XLSX, dan PPTX.",status:"planned"},
+      {id:"file-compress",icon:"🗜️",category:"files",title:"Kompres file",desc:"Perkecil ukuran file dengan menjaga format aslinya jika memungkinkan.",status:"planned"},
+      {id:"image-tools",icon:"🖼️",category:"creative",title:"Pengolah gambar",desc:"Kompres, ubah ukuran, dan konversi JPG, PNG, serta WebP.",status:"planned"},
+      {id:"audio-tools",icon:"🎧",category:"creative",title:"Pengolah audio",desc:"Alat untuk memotong dan mengonversi format audio yang didukung.",status:"planned"},
+      {id:"video-tools",icon:"🎬",category:"creative",title:"Pengolah video",desc:"Alat untuk mengelola ukuran, durasi, dan format video yang kompatibel.",status:"planned"},
+      {id:"archive-tools",icon:"🗃️",category:"files",title:"Arsip & ZIP",desc:"Buat dan buka arsip ZIP untuk mengelola banyak file sekaligus.",status:"planned"},
+      {id:"budget-tools",icon:"💳",category:"finance",title:"Anggaran pribadi",desc:"Catat pemasukan, pengeluaran, dan rencana anggaran sederhana.",status:"planned"},
+      {id:"business-tools",icon:"📈",category:"finance",title:"Kalkulator usaha",desc:"Hitung modal, biaya, harga jual, omzet, dan perkiraan laba.",status:"planned"},
+      {id:"farm-planner",icon:"🌱",category:"business",title:"Asisten pertanian",desc:"Rencana tanam, catatan panen, kebutuhan produksi, dan perhitungan usaha tani.",status:"planned"},
+      {id:"small-business",icon:"🏪",category:"business",title:"Manajemen usaha kecil",desc:"Kelola stok, daftar produk, pesanan, dan catatan penjualan.",status:"planned"},
+      {id:"public-services",icon:"🏛️",category:"community",title:"Panduan layanan publik",desc:"Panduan administrasi dan informasi layanan masyarakat dari sumber tepercaya.",status:"planned"},
+      {id:"accessibility",icon:"♿",category:"community",title:"Aksesibilitas digital",desc:"Alat bantu agar layanan digital lebih mudah digunakan banyak orang.",status:"planned"},
+      {id:"creative-studio",icon:"✨",category:"creative",title:"Studio kreatif",desc:"Ruang alat bantu untuk ide, desain, konten, dan karya digital.",status:"planned"}
     ];
 
     const $ = selector => document.querySelector(selector);
@@ -838,10 +865,11 @@ html.site-dark body a{color:#93c5fd}
       $("#toolsGrid").innerHTML = filtered.map(tool => `
         <article class="tool-card">
           <div class="tool-icon">${tool.icon}</div>
-          <h3>${safeText(tr(tool.titleKey))}</h3>
-          <p>${safeText(tr(tool.descKey))}</p>
+          <h3>${safeText(tool.title || tr(tool.titleKey))}</h3>
+          <p>${safeText(tool.desc || tr(tool.descKey))}</p>
+          ${tool.status ? '<span class="tool-status">Dalam pengembangan</span><br>' : ""}
           <a class="tool-link" href="#${tool.id}" data-open-tool="${tool.id}">
-            ${safeText(tr("use"))}
+            ${tool.status ? "Lihat rencana" : safeText(tr("use"))}
           </a>
         </article>
       `).join("");
@@ -891,8 +919,9 @@ html.site-dark body a{color:#93c5fd}
       const body = $("#toolBody");
       body.innerHTML = "";
 
-
-      if (id === "currency") {
+      if (tool.status === "planned") {
+        body.innerHTML = `<div class="result"><strong style="font-size:18px">Layanan ini masuk rencana pengembangan Bantu Dunia.</strong><p style="margin-top:9px">Fitur belum aktif dan belum bisa memproses file atau data. Saat dibangun, kami akan memilih teknologi yang sesuai dengan format dan kemampuan perangkat agar hasilnya aman dan tidak merusak file asli.</p><p style="margin-top:9px;font-size:13px;color:var(--muted)">Tidak semua format dapat dikonversi satu sama lain. Dukungan akan ditentukan berdasarkan kompatibilitas dan kualitas hasil.</p></div>`;
+      } else if (id === "currency") {
         body.innerHTML = `
           <p>Nilai di bawah menunjukkan berapa banyak mata uang yang setara dengan <b>1 USD</b>. Data diambil dari layanan kurs Frankfurter yang memakai data referensi bank sentral Eropa. Kurs referensi bukan selalu kurs jual/beli bank atau money changer.</p>
           <div class="field" style="margin-top:14px">
