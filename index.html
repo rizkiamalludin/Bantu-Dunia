@@ -517,7 +517,25 @@ body.dark .tool-status{background:#4b391b;color:#f7d58c}
     #toolBody .file-picker.has-file .file-picker-action{background:#15803d}
     @media(max-width:480px){#toolBody .file-picker-label{gap:10px;padding:12px}#toolBody .file-picker-icon{width:42px;height:42px}#toolBody .file-picker-action{padding:8px 10px;font-size:11px}}
 
-  </style>
+  
+    /* Animasi pembukaan ruang kerja untuk semua alat */
+    @keyframes toolWindowIn{from{opacity:0;transform:translateY(18px) scale(.975)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes toolIconIn{0%{opacity:0;transform:translateY(10px) rotate(-12deg) scale(.78)}70%{transform:translateY(-3px) rotate(3deg) scale(1.06)}100%{opacity:1;transform:translateY(0) rotate(0) scale(1)}}
+    @keyframes toolContentIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+    .modal.open .modal-content{animation:toolWindowIn .32s cubic-bezier(.2,.75,.25,1) both}
+    .modal.open .tool-modal-symbol{animation:toolIconIn .48s cubic-bezier(.2,.8,.25,1) both}
+    .modal.open .tool-modal-heading{animation:toolContentIn .32s .08s ease-out both}
+    .modal.open .tool-modal-divider{animation:toolContentIn .32s .12s ease-out both}
+    .modal.open #toolBody> *{animation:toolContentIn .32s ease-out both}
+    .modal.open #toolBody> :nth-child(2){animation-delay:.04s}
+    .modal.open #toolBody> :nth-child(3){animation-delay:.08s}
+    .modal.open #toolBody> :nth-child(4){animation-delay:.12s}
+    .modal.open #toolBody> :nth-child(5){animation-delay:.16s}
+    .modal.open .tool-modal-banner:after{animation:toolHalo 2.8s ease-in-out infinite alternate}
+    @keyframes toolHalo{from{transform:scale(.92);opacity:.55}to{transform:scale(1.08);opacity:1}}
+    @media(prefers-reduced-motion:reduce){.modal.open .modal-content,.modal.open .tool-modal-symbol,.modal.open .tool-modal-heading,.modal.open .tool-modal-divider,.modal.open #toolBody> *,.modal.open .tool-modal-banner:after{animation:none!important}}
+
+</style>
 
   <style id="site-quality-baseline">
     :focus-visible{outline:3px solid #38bdf8;outline-offset:3px}
